@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>이상형 월드컵 💕</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#080812;color:#fff;min-height:100vh;overflow-x:hidden;}
+
+    /* 시작 화면 */
+    .start{position:fixed;inset:0;background:#080812;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+    .start.hide{display:none;}
+    .s-emoji{font-size:4rem;margin-bottom:16px;}
+    .s-title{font-size:1.5rem;font-weight:800;margin-bottom:6px;background:linear-gradient(90deg,#ff80ab,#ce93d8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .s-sub{font-size:0.82rem;color:rgba(255,255,255,0.35);margin-bottom:22px;line-height:1.7;}
+    .s-label{font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:8px;font-weight:700;}
+    .s-row{display:flex;gap:10px;margin-bottom:18px;justify-content:center;}
+    .s-btn2{padding:14px 28px;border:1px solid rgba(255,255,255,0.15);border-radius:12px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:0.9rem;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px;}
+    .s-btn2 .icon{font-size:2rem;}
+    .s-btn2.on{border-color:#ff80ab;background:rgba(255,128,171,0.15);color:#fff;font-weight:700;}
+    .s-mode{display:flex;gap:8px;margin-bottom:22px;justify-content:center;}
+    .s-mode-btn{padding:8px 18px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);font-size:0.8rem;cursor:pointer;transition:all .2s;}
+    .s-mode-btn.on{background:rgba(255,128,171,0.18);border-color:#ff80ab;color:#fff;font-weight:700;}
+    .s-go{padding:14px 48px;border:none;border-radius:14px;background:linear-gradient(135deg,#ff4081,#7c4dff);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(255,64,129,0.3);}
+
+    /* 헤더 */
+    .header{text-align:center;padding:14px 16px 10px;background:linear-gradient(180deg,rgba(8,8,18,0.95),transparent);position:sticky;top:0;z-index:10;}
+    .logo{font-size:1.2rem;font-weight:800;background:linear-gradient(90deg,#ff80ab,#ce93d8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .round-info{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:3px;}
+    .round-badge{display:inline-block;background:rgba(255,128,171,0.12);border:1px solid rgba(255,128,171,0.25);border-radius:20px;padding:2px 12px;font-size:0.72rem;color:#ff80ab;font-weight:700;margin-top:4px;}
+
+    /* VS 아레나 */
+    .arena{display:flex;min-height:calc(100vh - 80px);position:relative;}
+    .pick{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;cursor:pointer;transition:all .35s;position:relative;overflow:hidden;}
+    .pick:hover{background:rgba(255,255,255,0.03);}
+    .pick:active{transform:scale(0.97);}
+    .pick.left{background:linear-gradient(160deg,rgba(124,77,255,0.06),transparent);}
+    .pick.right{background:linear-gradient(200deg,rgba(255,64,129,0.06),transparent);}
+    .pick.chosen{animation:pop .45s ease-out;}
+    .pick.rejected{opacity:0.15;filter:grayscale(1);pointer-events:none;transition:all .4s;}
+    @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+    .vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7c4dff,#ff4081);display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:900;box-shadow:0 0 25px rgba(255,64,129,0.35);}
+
+    /* 사진 카드 */
+    .avatar{width:150px;height:150px;border-radius:50%;overflow:hidden;margin-bottom:14px;border:3px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:3.5rem;background:#1a1a2e;}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+    .p-name{font-size:1.25rem;font-weight:800;margin-bottom:3px;}
+    .p-group{font-size:0.75rem;color:rgba(255,255,255,0.4);margin-bottom:6px;}
+    .p-desc{font-size:0.68rem;color:rgba(255,255,255,0.28);text-align:center;max-width:150px;line-height:1.4;}
+
+    /* 결과 */
+    .result{position:fixed;inset:0;background:#080812;z-index:50;display:none;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;}
+    .result.show{display:flex;}
+    .r-crown{font-size:3.5rem;margin:28px 0 8px;}
+    .r-label{font-size:0.8rem;color:rgba(255,255,255,0.3);margin-bottom:8px;}
+    .r-avatar{width:150px;height:150px;border-radius:50%;overflow:hidden;border:4px solid #ff4081;margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:4rem;background:#1a1a2e;}
+    .r-avatar img{width:100%;height:100%;object-fit:cover;}
+    .r-name{font-size:1.8rem;font-weight:900;background:linear-gradient(90deg,#ff80ab,#ce93d8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:3px;}
+    .r-group{font-size:0.82rem;color:rgba(255,255,255,0.4);margin-bottom:22px;}
+
+    .ranking{width:100%;max-width:380px;margin-bottom:28px;}
+    .rk-title{font-size:0.78rem;color:rgba(255,255,255,0.28);margin-bottom:8px;text-align:center;}
+    .rk-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(255,255,255,0.03);border-radius:9px;margin-bottom:4px;}
+    .rk-n{font-size:0.82rem;font-weight:800;width:26px;text-align:center;}
+    .rk-n.g{color:#ffd54f;}.rk-n.s{color:#b0bec5;}.rk-n.b{color:#ff8a65;}
+    .rk-mini{width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;background:#1a1a2e;}
+    .rk-mini img{width:100%;height:100%;object-fit:cover;}
+    .rk-name{font-size:0.82rem;font-weight:600;flex:1;}
+    .rk-grp{font-size:0.65rem;color:rgba(255,255,255,0.25);}
+    .retry{padding:13px 42px;border:none;border-radius:14px;background:linear-gradient(135deg,#ff4081,#7c4dff);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;margin-bottom:40px;}
+
+    @media(max-width:420px){.avatar{width:120px;height:120px;}.p-name{font-size:1.05rem;}.vs{width:40px;height:40px;font-size:0.78rem;}}
+  </style>
+</head>
+<body>
+
+<!-- 시작 -->
+<div class="start" id="startScreen">
+  <div class="s-emoji">💕</div>
+  <div class="s-title">이상형 월드컵</div>
+  <div class="s-sub">둘 중 더 끌리는 사람을 골라<br>나의 최종 이상형을 찾아보세요!</div>
+
+  <div class="s-label">성별 선택</div>
+  <div class="s-row">
+    <button class="s-btn2 on" id="gF" onclick="setGender('F')"><span class="icon">👩</span>여성</button>
+    <button class="s-btn2" id="gM" onclick="setGender('M')"><span class="icon">👨</span>남성</button>
+  </div>
+
+  <div class="s-label">라운드</div>
+  <div class="s-mode">
+    <button class="s-mode-btn on" data-n="8" onclick="setN(8,this)">8강</button>
+    <button class="s-mode-btn" data-n="16" onclick="setN(16,this)">16강</button>
+  </div>
+
+  <button class="s-go" onclick="startGame()">시작하기</button>
+</div>
+
+<!-- 게임 -->
+<div id="gameArea" style="display:none;">
+  <div class="header">
+    <div class="logo">💕 이상형 월드컵</div>
+    <div class="round-info" id="roundInfo"></div>
+    <div class="round-badge" id="roundBadge"></div>
+  </div>
+  <div class="arena">
+    <div class="pick left" id="pickL" onclick="choose(0)">
+      <div class="avatar" id="avL"></div>
+      <div class="p-name" id="nmL"></div>
+      <div class="p-group" id="grL"></div>
+      <div class="p-desc" id="dsL"></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="pick right" id="pickR" onclick="choose(1)">
+      <div class="avatar" id="avR"></div>
+      <div class="p-name" id="nmR"></div>
+      <div class="p-group" id="grR"></div>
+      <div class="p-desc" id="dsR"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 결과 -->
+<div class="result" id="resultScreen">
+  <div class="r-crown">👑</div>
+  <div class="r-label">나의 이상형 1위</div>
+  <div class="r-avatar" id="rAv"></div>
+  <div class="r-name" id="rNm"></div>
+  <div class="r-group" id="rGr"></div>
+  <div class="ranking" id="ranking"></div>
+  <button class="retry" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+const FEMALE=[
+  {name:'장원영',group:'IVE',desc:'프듀48 1위, 비주얼 끝판왕',img:'https://kprofiles.com/wp-content/uploads/2021/11/wonyong-768x1024.jpg',emoji:'🐰'},
+  {name:'안유진',group:'IVE',desc:'IVE 리더, 만능 엔터테이너',img:'https://kprofiles.com/wp-content/uploads/2021/11/yujin-768x1024.jpg',emoji:'🐶'},
+  {name:'가을',group:'IVE',desc:'IVE 최연장, 댄스 실력파',img:'https://kprofiles.com/wp-content/uploads/2021/11/SnapInsta.to_628181153_18084368660601032_393818886811121239_n-769x1024.jpg',emoji:'🐿️'},
+  {name:'레이',group:'IVE',desc:'일본 출신, 래퍼 겸 보컬',img:'https://kprofiles.com/wp-content/uploads/2021/11/rei-9-768x1024.jpg',emoji:'🦋'},
+  {name:'리즈',group:'IVE',desc:'제주 출신, 메인 보컬',img:'https://kprofiles.com/wp-content/uploads/2021/11/liz-9-768x1024.jpg',emoji:'🐈‍⬛'},
+  {name:'이서',group:'IVE',desc:'IVE 막내, 활발한 에너지',img:'https://kprofiles.com/wp-content/uploads/2021/11/IMG_8374-600x800.jpeg',emoji:'🐯'},
+  {name:'카리나',group:'aespa',desc:'에스파 리더, 걸크러시',img:'https://kprofiles.com/wp-content/uploads/2020/11/IMG_1584-534x800.jpeg',emoji:'✨'},
+  {name:'윈터',group:'aespa',desc:'에스파 보컬, 시크한 매력',img:'https://kprofiles.com/wp-content/uploads/2020/11/IMG_1581-534x800.jpeg',emoji:'❄️'},
+  {name:'민지',group:'NewJeans',desc:'뉴진스 리더, 올라운더',img:'https://kprofiles.com/wp-content/uploads/2022/07/NewJeans-Single-Album-How-Sweet-Concept-Photo-documents-2.jpeg',emoji:'💫'},
+  {name:'하니',group:'NewJeans',desc:'호주 출신, 유니크 매력',img:'https://uploads.disquscdn.com/images/63cd5216c1bb5a0f8be180522393d7f17df3b1bf938d85ecdc21634886d6395b.png?w=800&h=1107',emoji:'🌙'},
+  {name:'해린',group:'NewJeans',desc:'고양이상, 사랑스러운',img:'https://kprofiles.com/wp-content/uploads/2022/07/NewJeans-How-Sweet-Concept-Photo-documents-8.jpeg',emoji:'🐱'},
+  {name:'김채원',group:'LE SSERAFIM',desc:'르세라핌 리더, 천재',img:'https://kprofiles.com/wp-content/uploads/2025/02/KIM-CHAEWON-scaled.jpg',emoji:'🦋'},
+  {name:'사쿠라',group:'LE SSERAFIM',desc:'AKB48 출신, 국민 아이돌',img:'https://kprofiles.com/wp-content/uploads/2022/03/SAKURA-900x720.jpeg',emoji:'🌸'},
+  {name:'제니',group:'BLACKPINK',desc:'인간 샤넬, SOLO 대히트',img:'https://kprofiles.com/wp-content/uploads/2017/06/jennie-ruby-1st-full-album.jpg',emoji:'🖤'},
+  {name:'로제',group:'BLACKPINK',desc:'호주 출신, APT. 대히트',img:'https://kprofiles.com/wp-content/uploads/2016/08/Rose-Blackpink-2025.jpg',emoji:'🌹'},
+  {name:'수지',group:'배우/가수',desc:'국민 첫사랑',img:'https://kprofiles.com/wp-content/uploads/2016/06/BAESUZY.jpeg',emoji:'🌸'},
+  {name:'아이유',group:'솔로 가수',desc:'음원 퀸, 국민 여동생',img:'https://kprofiles.com/wp-content/uploads/2016/09/IU-5.jpg',emoji:'🎵'},
+];
+
+const MALE=[
+  {name:'차은우',group:'ASTRO/배우',desc:'얼굴 천재, 내 ID는 강남미인',img:'https://kprofiles.com/wp-content/uploads/2018/10/EUNWOO-2-600x800.jpg',emoji:'✨'},
+  {name:'뷔',group:'BTS',desc:'세계가 사랑한 얼굴',img:'https://kprofiles.com/wp-content/uploads/2016/08/V-3-800x800.jpg',emoji:'🐻'},
+  {name:'정국',group:'BTS',desc:'황금 막내, Standing Next to You',img:'https://kprofiles.com/wp-content/uploads/2016/08/jungkook-seven-600x800.jpg',emoji:'🐰'},
+  {name:'지민',group:'BTS',desc:'현대무용 출신, Like Crazy',img:'https://kprofiles.com/wp-content/uploads/2016/04/Jimin.jpg',emoji:'🐥'},
+  {name:'박보검',group:'배우',desc:'구르미 그린 달빛, 청량 미소',img:'https://pbs.twimg.com/media/C_i_-9eWAAALqw2.jpg',emoji:'😊'},
+  {name:'이민호',group:'배우',desc:'꽃보다 남자, 상속자들',img:'https://kprofiles.com/wp-content/uploads/2016/05/LeeMinho-800x800.jpg',emoji:'👑'},
+  {name:'현빈',group:'배우',desc:'사랑의 불시착, 리정혁',img:'https://kprofiles.com/wp-content/uploads/2021/03/Hyun-Bin.jpg',emoji:'💪'},
+  {name:'송중기',group:'배우',desc:'태양의 후예, 빈센조',img:'https://pbs.twimg.com/media/FGwRKU5VgAE9XYH?format=jpg&name=large',emoji:'⚔️'},
+  {name:'김수현',group:'배우',desc:'별에서 온 그대, 눈물의 여왕',img:'https://kprofiles.com/wp-content/uploads/2017/11/Kim-Soohyun.jpeg',emoji:'🌟'},
+  {name:'공유',group:'배우',desc:'도깨비, 부산행, 커피 CF',img:'https://kprofiles.com/wp-content/uploads/2017/08/GONG-YOO-640x800.jpg',emoji:'☕'},
+  {name:'변우석',group:'배우',desc:'선재 업고 튀어, 떠오르는 신예',img:'https://kprofiles.com/wp-content/uploads/2021/04/byeon-woo-seok.jpg',emoji:'🔥'},
+  {name:'박서준',group:'배우',desc:'이태원 클라쓰, 마블 출연',img:'https://kprofiles.com/wp-content/uploads/2018/03/Park-Seo-Joon.jpg',emoji:'🥊'},
+  {name:'송강',group:'배우',desc:'나빌레라, 그해 우리는',img:'https://kprofiles.com/wp-content/uploads/2019/09/WhatsApp-Image-2019-09-27-at-8.18.56-PM.jpeg',emoji:'🦋'},
+  {name:'안효섭',group:'배우',desc:'사내맞선, 어게인 마이 라이프',img:'https://kprofiles.com/wp-content/uploads/2019/03/Ahn-Hyo-seop-1-582x800.jpg',emoji:'💫'},
+  {name:'황인엽',group:'배우',desc:'여신강림, 패밀리',img:'https://kprofiles.com/wp-content/uploads/2020/10/inyoup.jpg',emoji:'🐺'},
+  {name:'지창욱',group:'배우',desc:'히어로, 수상한 파트너',img:'https://kprofiles.com/wp-content/uploads/2017/07/Ji-Changwook.jpg',emoji:'🎭'},
+];
+
+let gender='F', totalN=8, pool=[], matchups=[], mi=0, roundNum=0, winners=[], ranking=[], roundSize=0;
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function setGender(g){
+  gender=g;
+  document.getElementById('gF').classList.toggle('on',g==='F');
+  document.getElementById('gM').classList.toggle('on',g==='M');
+}
+
+function setN(n,el){
+  totalN=n;
+  document.querySelectorAll('.s-mode-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function startGame(){
+  const src = gender==='F' ? FEMALE : MALE;
+  pool = shuffle(src).slice(0, totalN);
+  ranking=[]; roundNum=0;
+  document.getElementById('startScreen').classList.add('hide');
+  document.getElementById('gameArea').style.display='block';
+  startRound();
+}
+
+function startRound(){
+  roundSize=pool.length; roundNum++;
+  matchups=[];
+  for(let i=0;i<pool.length;i+=2) matchups.push([pool[i],pool[i+1]]);
+  mi=0; winners=[];
+  updateInfo(); showMatch();
+}
+
+function getRoundName(s){
+  if(s===2) return '💕 결승전';
+  if(s===4) return '준결승 (4강)';
+  return s+'강';
+}
+
+function updateInfo(){
+  document.getElementById('roundBadge').textContent=getRoundName(roundSize);
+  document.getElementById('roundInfo').textContent=`${mi+1} / ${matchups.length}`;
+}
+
+function showMatch(){
+  if(mi>=matchups.length){
+    if(winners.length===1){ ranking.unshift(winners[0]); showResult(); return; }
+    pool=winners; startRound(); return;
+  }
+  updateInfo();
+  const [a,b]=matchups[mi];
+  setCard('L',a); setCard('R',b);
+  const pL=document.getElementById('pickL'), pR=document.getElementById('pickR');
+  pL.className='pick left'; pR.className='pick right';
+  pL.style.pointerEvents='auto'; pR.style.pointerEvents='auto';
+}
+
+function setCard(side,p){
+  const av=document.getElementById('av'+side);
+  if(p.img){
+    av.innerHTML=`<img src="${p.img}" onerror="this.parentElement.innerHTML='${p.emoji}'"/>`;
+    av.style.background='#1a1a2e';
+  } else {
+    av.innerHTML=p.emoji;
+    av.style.background='linear-gradient(135deg,#2a1a4e,#1a1a3e)';
+  }
+  document.getElementById('nm'+side).textContent=p.name;
+  document.getElementById('gr'+side).textContent=p.group;
+  document.getElementById('ds'+side).textContent=p.desc;
+}
+
+function choose(side){
+  const [a,b]=matchups[mi];
+  const winner=side===0?a:b, loser=side===0?b:a;
+  ranking.unshift(loser); winners.push(winner);
+
+  const cEl=document.getElementById(side===0?'pickL':'pickR');
+  const rEl=document.getElementById(side===0?'pickR':'pickL');
+  cEl.classList.add('chosen'); rEl.classList.add('rejected');
+  cEl.style.pointerEvents='none'; rEl.style.pointerEvents='none';
+
+  setTimeout(()=>{ mi++; showMatch(); },550);
+}
+
+function showResult(){
+  document.getElementById('gameArea').style.display='none';
+  const r=document.getElementById('resultScreen');
+  r.classList.add('show');
+
+  const champ=ranking[0];
+  const av=document.getElementById('rAv');
+  if(champ.img){
+    av.innerHTML=`<img src="${champ.img}" onerror="this.parentElement.innerHTML='${champ.emoji}'"/>`;
+    av.style.background='#1a1a2e';
+  } else { av.innerHTML=champ.emoji; av.style.background='linear-gradient(135deg,#2a1a4e,#1a1a3e)'; }
+  document.getElementById('rNm').textContent=champ.name;
+  document.getElementById('rGr').textContent=champ.group;
+
+  const rk=document.getElementById('ranking');
+  const top=ranking.slice(0,Math.min(8,ranking.length));
+  rk.innerHTML=`<div class="rk-title">🏆 최종 순위</div>`+top.map((p,i)=>{
+    const nc=i===0?'g':i===1?'s':i===2?'b':'';
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    const mini=p.img
+      ?`<div class="rk-mini"><img src="${p.img}" onerror="this.parentElement.innerHTML='${p.emoji}'"/></div>`
+      :`<div class="rk-mini" style="background:linear-gradient(135deg,#2a1a4e,#1a1a3e)">${p.emoji}</div>`;
+    return `<div class="rk-item"><div class="rk-n ${nc}">${medal||i+1}</div>${mini}<div class="rk-name">${p.name}</div><div class="rk-grp">${p.group}</div></div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

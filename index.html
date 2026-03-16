@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IVE 포토카드 💜</title>
+  <style>
+    :root { --p:#7c4dff; --pk:#ff4081; --card:110px; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#0a0015;color:#fff;min-height:100vh;}
+
+    /* HEADER */
+    header{background:linear-gradient(135deg,#140028,#260049);border-bottom:1px solid #351560;padding:12px 16px;position:sticky;top:0;z-index:100;}
+    .h-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+    .logo{font-size:1.15rem;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,#ce93d8,#f48fb1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .h-right{display:flex;gap:5px;align-items:center;}
+    .cnt{background:linear-gradient(135deg,var(--p),var(--pk));padding:4px 11px;border-radius:20px;font-size:0.78rem;font-weight:700;}
+    .own-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:4px 9px;color:rgba(255,255,255,0.55);font-size:0.7rem;cursor:pointer;transition:all .2s;}
+    .own-btn.on{background:rgba(124,77,255,0.38);border-color:var(--p);color:#fff;}
+    .srch input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:9px;padding:7px 13px;color:#fff;font-size:0.83rem;outline:none;margin-bottom:8px;}
+    .srch input::placeholder{color:rgba(255,255,255,0.3);}
+    .srch input:focus{border-color:var(--p);}
+    .tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;}
+    .tabs::-webkit-scrollbar{display:none;}
+    .tab{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:4px 11px;color:rgba(255,255,255,0.55);font-size:0.73rem;cursor:pointer;white-space:nowrap;transition:all .2s;}
+    .tab:hover{background:rgba(124,77,255,0.28);color:#fff;}
+    .tab.on{background:linear-gradient(135deg,var(--p),var(--pk));border-color:transparent;color:#fff;font-weight:700;}
+
+    /* MEMBER BAR */
+    .mbar{display:flex;gap:7px;overflow-x:auto;padding:9px 15px;scrollbar-width:none;background:rgba(255,255,255,0.025);border-bottom:1px solid rgba(255,255,255,0.06);}
+    .mbar::-webkit-scrollbar{display:none;}
+    .mbtn{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;opacity:.42;transition:opacity .2s;flex-shrink:0;}
+    .mbtn.on{opacity:1;}
+    .mav{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#7c4dff,#ff4081);display:flex;align-items:center;justify-content:center;font-size:1.05rem;border:2px solid transparent;transition:border-color .2s;}
+    .mbtn.on .mav{border-color:#ce93d8;}
+    .mname{font-size:0.65rem;color:rgba(255,255,255,0.75);}
+
+    /* CARD GRID */
+    #ct{padding-bottom:80px;}
+    .cg{margin:15px 0 0;padding:0 13px;}
+    .clabel{font-size:0.7rem;font-weight:700;color:#ce93d8;text-transform:uppercase;letter-spacing:1.5px;padding:3px 9px;background:rgba(124,77,255,0.14);border-left:3px solid var(--p);border-radius:0 5px 5px 0;display:inline-block;}
+    .bhead{display:flex;align-items:center;gap:7px;padding:7px 13px 2px;}
+    .btype{font-size:0.6rem;padding:2px 6px;border-radius:4px;font-weight:700;}
+    .btype.album{background:rgba(255,64,129,0.17);color:#ff80ab;}
+    .btype.benefit{background:rgba(0,200,150,0.13);color:#69f0ae;}
+    .btype.event{background:rgba(255,200,0,0.13);color:#ffd54f;}
+    .btype.goods{background:rgba(100,180,255,0.13);color:#90caf9;}
+    .bname{font-size:0.73rem;color:rgba(255,255,255,0.5);}
+    .grid{display:flex;flex-wrap:wrap;gap:5px;padding:3px 13px 9px;}
+
+    .card{width:var(--card);height:calc(var(--card)*1.45);border-radius:8px;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:transform .15s,border-color .15s;background:#160030;}
+    .card:hover{transform:scale(1.04);}
+    .card.owned{border-color:#ce93d8;}
+    .card.wish{border-color:#ff80ab;}
+    .card img{width:100%;height:100%;object-fit:cover;display:block;}
+    .odot{position:absolute;top:5px;right:5px;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.62rem;}
+    .card.owned .odot{display:flex;background:linear-gradient(135deg,var(--p),var(--pk));}
+    .card.wish .odot{display:flex;background:linear-gradient(135deg,#ff4081,#f48fb1);}
+    .clbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.87) 35%);padding:15px 4px 4px;}
+    .cmember{font-size:0.63rem;font-weight:700;text-align:center;color:#fff;line-height:1.2;}
+    .cver{font-size:0.52rem;text-align:center;color:rgba(255,255,255,0.46);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px;margin-top:1px;}
+
+    /* LOADING */
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:13px;}
+    .spin{width:42px;height:42px;border:3px solid rgba(255,255,255,0.09);border-top-color:var(--p);border-radius:50%;animation:sp .8s linear infinite;}
+    @keyframes sp{to{transform:rotate(360deg);}}
+    .ltxt{color:rgba(255,255,255,0.4);font-size:0.83rem;}
+    .empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,0.28);}
+
+    /* MODAL */
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+    .backdrop.open{display:flex;}
+    .modal{background:#110020;border:1px solid rgba(124,77,255,0.32);border-radius:20px 20px 0 0;width:100%;max-width:500px;max-height:94vh;overflow-y:auto;overscroll-behavior:contain;}
+    .mhandle{width:38px;height:4px;background:rgba(255,255,255,0.16);border-radius:2px;margin:11px auto 0;}
+
+    /* 카드 정보 */
+    .mtop{display:flex;gap:13px;padding:13px 15px 11px;}
+    .mimg{width:98px;height:142px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);}
+    .minfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px;}
+    .mmember{font-size:1rem;font-weight:800;}
+    .irows{display:flex;flex-direction:column;gap:4px;}
+    .irow{display:flex;gap:7px;font-size:0.72rem;}
+    .ikey{color:rgba(255,255,255,0.3);width:42px;flex-shrink:0;padding-top:1px;}
+    .ival{color:rgba(255,255,255,0.85);font-weight:600;line-height:1.3;}
+    .tag{display:inline-block;border-radius:4px;padding:1px 6px;font-size:0.65rem;font-weight:700;}
+    .tag.album{background:rgba(255,64,129,0.17);color:#ff80ab;}
+    .tag.benefit{background:rgba(0,200,150,0.13);color:#69f0ae;}
+    .tag.event{background:rgba(255,200,0,0.13);color:#ffd54f;}
+    .tag.goods{background:rgba(100,180,255,0.13);color:#90caf9;}
+    .tag.v{background:rgba(124,77,255,0.18);color:#ce93d8;}
+    .togbtn{width:100%;padding:8px;border-radius:9px;border:none;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all .2s;}
+    .togbtn.no{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);}
+    .togbtn.own-on{background:linear-gradient(135deg,var(--p),var(--pk));color:#fff;}
+    .togbtn.wish-on{background:linear-gradient(135deg,#ff4081,#f48fb1);color:#fff;}
+
+    /* 시세 */
+    .psec{padding:0 15px 28px;}
+    .pdiv{border:none;border-top:1px solid rgba(255,255,255,0.06);margin-bottom:13px;}
+    .ptitle{font-size:0.8rem;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:10px;letter-spacing:.4px;}
+
+    /* pocamarket 카드 그리드 - 사진 크게 보여주기 */
+    .poca-note{font-size:0.65rem;color:rgba(255,255,255,0.25);margin-bottom:8px;text-align:center;}
+    .poca-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+    .poca-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;text-decoration:none;color:inherit;transition:all .2s;display:flex;flex-direction:column;}
+    .poca-card:hover{border-color:rgba(124,77,255,0.5);transform:scale(1.03);}
+    .poca-card-img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#1a0033;display:block;}
+    .poca-card-body{padding:6px 7px 8px;}
+    .poca-card-name{font-size:0.6rem;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+    .poca-card-price{font-size:0.85rem;font-weight:800;color:#f0e6ff;}
+    .poca-card-recent{font-size:0.55rem;color:rgba(255,255,255,0.28);margin-top:1px;}
+    .poca-card-stock{font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;}
+    .poca-more{display:block;text-align:center;padding:8px;border-radius:8px;border:1px solid rgba(124,77,255,0.3);color:#ce93d8;font-size:0.75rem;text-decoration:none;transition:all .2s;margin-bottom:14px;}
+    .poca-more:hover{background:rgba(124,77,255,0.15);}
+
+    /* 번개장터 */
+    .bj-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+    .bj-title{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.5);}
+    .bj-more{font-size:0.67rem;padding:3px 7px;border-radius:5px;text-decoration:none;border:1px solid rgba(255,150,50,0.32);color:#ff9040;}
+    .bjq{font-size:0.6rem;color:rgba(255,255,255,0.18);margin-bottom:7px;}
+    .avg{background:rgba(124,77,255,0.09);border:1px solid rgba(124,77,255,0.18);border-radius:9px;padding:9px 13px;margin-bottom:8px;display:none;align-items:center;justify-content:space-between;}
+    .avg-l .avg-lb{font-size:0.67rem;color:rgba(255,255,255,0.36);}
+    .avg-l .avg-rg{font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:2px;}
+    .avg-v{font-size:1rem;font-weight:800;color:#f48fb1;}
+    .bj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+    .bj-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;text-decoration:none;color:inherit;transition:all .2s;display:flex;flex-direction:column;}
+    .bj-card:hover{border-color:rgba(255,150,50,0.5);transform:scale(1.03);}
+    .bj-card-img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#1a0033;display:block;}
+    .bj-card-body{padding:6px 7px 8px;}
+    .bj-card-name{font-size:0.58rem;color:rgba(255,255,255,0.55);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;margin-bottom:3px;}
+    .bj-card-price{font-size:0.85rem;font-weight:800;color:#fff;}
+    .bj-card-date{font-size:0.52rem;color:rgba(255,255,255,0.22);margin-top:2px;}
+    .bj-card-new{font-size:0.5rem;background:rgba(255,64,129,0.16);color:#ff80ab;border-radius:3px;padding:1px 3px;display:inline-block;margin-top:2px;}
+
+    .ploading{display:flex;align-items:center;gap:7px;padding:12px 0;color:rgba(255,255,255,0.28);font-size:0.78rem;}
+    .pspin{width:14px;height:14px;border:2px solid rgba(255,255,255,0.07);border-top-color:#ce93d8;border-radius:50%;animation:sp .7s linear infinite;}
+    .pempty{text-align:center;padding:14px 0;color:rgba(255,255,255,0.26);font-size:0.78rem;line-height:1.7;}
+
+    @media(max-width:480px){:root{--card:94px;}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="h-top">
+    <div class="logo">💜 IVE POCALIST</div>
+    <div class="h-right">
+      <button class="own-btn" id="filterOwn" onclick="setViewFilter('owned')">보유</button>
+      <button class="own-btn" id="filterWish" onclick="setViewFilter('wish')">위시</button>
+      <div class="cnt" id="cnt">0 / 0</div>
+    </div>
+  </div>
+  <div class="srch"><input id="srch" placeholder="검색 (멤버, 앨범, 혜택처...)" oninput="filter()"/></div>
+  <div class="tabs" id="tabs"><button class="tab on" onclick="selCat('ALL',this)">전체</button></div>
+</header>
+
+<div class="mbar">
+  <div class="mbtn on" onclick="selMem('ALL',this)"><div class="mav">🎵</div><div class="mname">전체</div></div>
+  <div class="mbtn" onclick="selMem('유진',this)"><div class="mav">💜</div><div class="mname">유진</div></div>
+  <div class="mbtn" onclick="selMem('가을',this)"><div class="mav">🍂</div><div class="mname">가을</div></div>
+  <div class="mbtn" onclick="selMem('레이',this)"><div class="mav">⭐</div><div class="mname">레이</div></div>
+  <div class="mbtn" onclick="selMem('원영',this)"><div class="mav">🌸</div><div class="mname">원영</div></div>
+  <div class="mbtn" onclick="selMem('리즈',this)"><div class="mav">🌙</div><div class="mname">리즈</div></div>
+  <div class="mbtn" onclick="selMem('이서',this)"><div class="mav">🦋</div><div class="mname">이서</div></div>
+</div>
+
+<div id="ct">
+  <div class="loading" id="ls"><div class="spin"></div><div class="ltxt">포토카드 불러오는 중... 💜</div></div>
+</div>
+
+<!-- MODAL -->
+<div class="backdrop" id="bd" onclick="closeBd(event)">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtop">
+      <img class="mimg" id="mimg" src="" alt=""/>
+      <div class="minfo">
+        <div class="mmember" id="mmem"></div>
+        <div class="irows" id="irows"></div>
+        <div style="display:flex;gap:5px;">
+          <button class="togbtn no" id="btnOwn" onclick="togState('owned')" style="flex:1"></button>
+          <button class="togbtn no" id="btnWish" onclick="togState('wish')" style="flex:1"></button>
+        </div>
+      </div>
+    </div>
+    <div class="psec">
+      <hr class="pdiv"/>
+      <div class="ptitle">💰 포카마켓 시세 (한국 · 원)</div>
+      <div id="pocaList"><div class="ploading"><div class="pspin"></div>포카마켓 시세 조회 중...</div></div>
+      <a class="poca-more" id="pocaMore" href="#" target="_blank">pocamarket.com에서 더 보기 ↗</a>
+
+      <div class="bj-head">
+        <div class="bj-title">🔥 번개장터 실시간 매물 (원)</div>
+        <a class="bj-more" id="bjMore" href="#" target="_blank">전체보기 ↗</a>
+      </div>
+      <div class="bjq" id="bjq"></div>
+      <div class="avg" id="avg">
+        <div class="avg-l"><div class="avg-lb">평균 시세</div><div class="avg-rg" id="avgrg"></div></div>
+        <div class="avg-v" id="avgv"></div>
+      </div>
+      <div id="bjList"><div class="ploading"><div class="pspin"></div>번개장터 조회 중...</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 상수 ──
+const POCA_GROUP = 21;
+const MEM_ID = { '유진':175,'가을':176,'레이':177,'원영':178,'리즈':179,'이서':180 };
+const MEM_EN  = { '유진':'YUJIN','가을':'GAEUL','레이':'REI','원영':'WONYOUNG','리즈':'LIZ','이서':'LEESEO' };
+const MEM_KR  = { '유진':'안유진','가을':'가을','레이':'레이','원영':'장원영','리즈':'리즈','이서':'이서' };
+const MEM_MAP = { '유진':['유진','AN','YUJIN'],'가을':['가을','GA','GAEUL'],'레이':['레이','REI'],'원영':['원영','WON','WONYOUNG'],'리즈':['리즈','LIZ'],'이서':['이서','LEE','LEESEO'] };
+const CAT_KR  = { 'REVIVE+':'리바이브','IVESECRET':'시크릿','EMPATHY':'엠퍼시','SECRET':'시크릿','SWITCH':'스위치',"I'VE MINE":'아이브마인',"I'VE IVE":'아이브아이브','LOVE DIVE':'러브다이브','ELEVEN':'일레븐','AFTER LIKE':'애프터라이크','dicon':'디콘','eider':'아이더','SuperStar':'슈퍼스타','MINIVEpopup3TP':'미니브팝업','nationalgeograpic':'내셔널지오그래픽','misekiseoul':'미세키서울','Hapa Kristin':'하파크리스틴' };
+
+// 포카마켓 검색 키워드 매핑 (pocalist category → pocamarket 검색어)
+const CAT_Q = {
+  'REVIVE+':'REVIVE',
+  'IVESECRET':'SECRET',
+  'EMPATHY':'EMPATHY','SECRET':'SECRET','SWITCH':'SWITCH',
+  "I'VE MINE":'MINE',"I'VE IVE":'IVE IVE',
+  'LOVE DIVE':'LOVE DIVE','ELEVEN':'ELEVEN','AFTER LIKE':'AFTER LIKE',
+  'dicon':'DICON',
+  'eider':'EIDER',
+  'SuperStar':'SUPERSTAR',
+  'MINIVEpopup3TP':'MINIVE POP-UP',
+  'nationalgeograpic':'NATIONAL GEOGRAPHIC',
+  'misekiseoul':'MISE EN SCENE',
+  'Hapa Kristin':'HAPA KRISTIN',
+};
+
+const TITLE_KR= { 'artbox':'아트박스','ktown4u':'케이타운포유','sonymusic':'소니뮤직','asmart':'에이스마트','soundwave':'사운드웨이브','musicart':'뮤직아트','melon':'멜론','yes24':'YES24','kyobo':'교보문고','hottracks':'핫트랙스','hanteo':'한터','makestar':'메이크스타','weverse':'위버스','starshipsquare':'스타쉽스퀘어','withmuudingo':'뮤드&딩고','qqmusic':'QQ뮤직','target':'타겟','walmart':'월마트','hmv':'HMV','amazon':'아마존','applemusic':'애플뮤직','usexclusive':'US독점','spotify':'스포티파이','1digipack':'디지팩1','2digipack':'디지팩2','musickorea':'뮤직코리아','oliveyoung':'올리브영','kakaotalk':'카카오톡','towerrecord':'타워레코드','b&n':'반스앤노블','kmonstar':'케이몬스타','idolshop':'아이돌샵','withmuu':'위드뮤','broadcast':'방송','showcase':'쇼케이스' };
+const TYPE_KR = { 'album':'앨범','benefit':'특전','event':'이벤트','goods':'굿즈' };
+const CAT_DISP= { 'ELEVEN':'ELEVEN (1st Single)','LOVE DIVE':'LOVE DIVE (2nd Single)','AFTER LIKE':'AFTER LIKE (3rd Single)',"I'VE IVE":"I've IVE (1st Album)","I'VE MINE":"I've MINE (1st EP)",'SWITCH':'IVE SWITCH (2nd EP)','EMPATHY':'IVE EMPATHY (3rd EP)','SECRET':'IVE SECRET (4th EP)','IVESECRET':'IVE SECRET (4th EP)','REVIVE+':'REVIVE+ (2nd Album)','dicon':'DICON 화보','eider':'EIDER 콜라보','SuperStar':'SuperStar 게임','MINIVEpopup3TP':'MINIVE 팝업','nationalgeograpic':'내셔널지오그래픽','misekiseoul':'미세키서울','Hapa Kristin':'하파크리스틴' };
+
+function tkey(s){ return (s||'').toLowerCase().replace(/\s/g,'').replace(/^ver\./,'').replace(/^[0-9]+/,''); }
+function getTitle(card){
+  const raw = card.title || '';
+  // ver. 접두사 제거 후 매핑
+  const cleaned = raw.replace(/^ver\./i,'').replace(/^[0-9]+/,'').trim();
+  return TITLE_KR[tkey(raw)] || TITLE_KR[tkey(cleaned)] || cleaned || '';
+}
+
+// 한국 포카마켓 API
+const PHOCA_API = 'https://api.phocamarket.com/card/v2/search';
+
+// ── 상태 ──
+let allCards=[], modalCard=null;
+let owned = new Set(JSON.parse(localStorage.getItem('ive_owned')||'[]'));
+let wish  = new Set(JSON.parse(localStorage.getItem('ive_wish')||'[]'));
+let selMember='ALL', curCat='ALL', viewFilter='all'; // 'all','owned','wish'
+
+// ── 로드 ──
+async function load(){
+  try{
+    const r = await fetch('https://pocali-backend.onrender.com/api/images');
+    const d = await r.json();
+    allCards = (Array.isArray(d)?d:(d.images||[])).filter(c=>(c.group||'').toUpperCase()==='IVE');
+    buildTabs(); filter();
+  }catch(e){
+    document.getElementById('ls').innerHTML='<div style="color:rgba(255,255,255,0.4);text-align:center;padding:40px">데이터를 불러오지 못했어요 😢<br><small>새로고침 해주세요</small></div>';
+  }
+}
+
+function buildTabs(){
+  const order=['ELEVEN','LOVE DIVE','AFTER LIKE',"I'VE IVE","I'VE MINE",'SWITCH','EMPATHY','SECRET','REVIVE+'];
+  const cats=[...new Set(allCards.map(c=>c.category).filter(Boolean))];
+  cats.sort((a,b)=>{const ai=order.indexOf(a.toUpperCase()),bi=order.indexOf(b.toUpperCase());if(ai<0&&bi<0)return a.localeCompare(b);return(ai<0?99:ai)-(bi<0?99:bi);});
+  const el=document.getElementById('tabs');
+  cats.forEach(c=>{const b=document.createElement('button');b.className='tab';b.textContent=c;b.onclick=()=>selCat(c,b);el.appendChild(b);});
+}
+
+function selMem(m,el){ selMember=m; document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); filter(); }
+function selCat(c,el){ curCat=c; document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on')); el.classList.add('on'); filter(); }
+function setViewFilter(f){
+  viewFilter = viewFilter===f ? 'all' : f;
+  document.getElementById('filterOwn').classList.toggle('on', viewFilter==='owned');
+  document.getElementById('filterWish').classList.toggle('on', viewFilter==='wish');
+  filter();
+}
+
+function filter(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  const out=allCards.filter(c=>{
+    if(curCat!=='ALL'&&c.category!==curCat)return false;
+    if(selMember!=='ALL'){const al=MEM_MAP[selMember]||[selMember];const cm=(c.member||'').trim();if(!al.some(a=>cm.includes(a)||a.includes(cm)))return false;}
+    if(q){const h=[c.member,c.category,c.title,c.version,getTitle(c)].join(' ').toLowerCase();if(!h.includes(q))return false;}
+    const uid=String(c.unique_id);
+    if(viewFilter==='owned'&&!owned.has(uid))return false;
+    if(viewFilter==='wish'&&!wish.has(uid))return false;
+    return true;
+  });
+  render(out); updateCnt();
+}
+
+function render(cards){
+  document.getElementById('ls')?.remove();
+  const ct=document.getElementById('ct');
+  if(!cards.length){ct.innerHTML='<div class="empty">💜<br><br>해당하는 포토카드가 없어요</div>';return;}
+  const groups={};
+  cards.forEach(c=>{
+    const cat=c.category||'기타';
+    if(!groups[cat])groups[cat]={};
+    const sub=c.title||'__';
+    if(!groups[cat][sub])groups[cat][sub]=[];
+    groups[cat][sub].push(c);
+  });
+  let h='';
+  Object.entries(groups).forEach(([cat,subs])=>{
+    h+=`<div class="cg"><span class="clabel">${CAT_DISP[cat.toUpperCase()]||cat}</span></div>`;
+    Object.entries(subs).forEach(([sub,cs])=>{
+      const ft=cs[0]?.file_type||'album';
+      const tkr=sub==='__'?'':(TITLE_KR[tkey(sub)]||sub);
+      h+=`<div class="bhead"><span class="btype ${ft}">${TYPE_KR[ft]||ft}</span>${tkr?`<span class="bname">${tkr}</span>`:''}</div>`;
+      h+='<div class="grid">';
+      cs.forEach(card=>{
+        const id=String(card.unique_id);
+        const cls=owned.has(id)?'owned':wish.has(id)?'wish':'';
+        h+=`<div class="card ${cls}" data-id="${id}"
+          onclick="tap('${id}')"
+          oncontextmenu="openM(event,'${id}')"
+          ontouchstart="lp('${id}',event)" ontouchend="clp()" ontouchmove="clp()">
+          <img src="${card.url}" loading="lazy" onerror="this.style.display='none'"/>
+          <div class="odot">${owned.has(id)?'✓':'♡'}</div>
+          <div class="clbl"><div class="cmember">${card.member||''}</div><div class="cver">${card.version||''}</div></div>
+        </div>`;
+      });
+      h+='</div>';
+    });
+  });
+  ct.innerHTML=h;
+}
+
+function tap(id){
+  // 클릭 → 보유 토글 (보유 시 위시에서 제거)
+  if(owned.has(id)){ owned.delete(id); }
+  else { owned.add(id); wish.delete(id); }
+  save(); updateCnt(); updateCard(id);
+}
+function updateCard(id){
+  const el=document.querySelector(`.card[data-id="${id}"]`);
+  if(!el)return;
+  el.classList.remove('owned','wish');
+  if(owned.has(id)) el.classList.add('owned');
+  else if(wish.has(id)) el.classList.add('wish');
+  const dot=el.querySelector('.odot');
+  if(dot) dot.textContent=owned.has(id)?'✓':wish.has(id)?'♡':'';
+  // 필터 모드에서 해당 안 되면 제거
+  if(viewFilter==='owned'&&!owned.has(id)) el.remove();
+  if(viewFilter==='wish'&&!wish.has(id)) el.remove();
+}
+function save(){
+  localStorage.setItem('ive_owned',JSON.stringify([...owned]));
+  localStorage.setItem('ive_wish',JSON.stringify([...wish]));
+}
+function updateCnt(){
+  document.getElementById('cnt').textContent=`보유 ${owned.size} · 위시 ${wish.size} / ${allCards.length}`;
+}
+
+let lpt=null;
+function lp(id,e){ lpt=setTimeout(()=>{ e.preventDefault(); openModalById(id); },500); }
+function clp(){ clearTimeout(lpt); }
+function openM(e,id){ e.preventDefault(); openModalById(id); }
+
+// ── 모달 ──
+function openModalById(id){
+  const card=allCards.find(c=>String(c.unique_id)===String(id));
+  if(!card)return;
+  modalCard=card;
+
+  document.getElementById('mimg').src=card.url;
+  document.getElementById('mmem').textContent=card.member||'';
+
+  const tkr=getTitle(card)||'-';
+  const ft=card.file_type||'album';
+  document.getElementById('irows').innerHTML=`
+    <div class="irow"><span class="ikey">앨범</span><span class="ival">${CAT_DISP[card.category?.toUpperCase()]||card.category||'-'}</span></div>
+    <div class="irow"><span class="ikey">종류</span><span class="ival"><span class="tag ${ft}">${TYPE_KR[ft]||ft}</span></span></div>
+    <div class="irow"><span class="ikey">혜택처</span><span class="ival">${tkr}</span></div>
+    ${card.version?`<div class="irow"><span class="ikey">버전</span><span class="ival"><span class="tag v">${card.version}</span></span></div>`:''}
+  `;
+
+  updateModalBtns(id);
+
+  // 포카마켓 더보기 링크
+  const memEn=MEM_EN[card.member]||card.member||'';
+  document.getElementById('pocaMore').href=`https://pocamarket.com/search/context?artist=IVE&member=${memEn}`;
+
+  // 번개장터 링크
+  const bjq=buildBjQ(card);
+  document.getElementById('bjMore').href=`https://m.bunjang.co.kr/search/products?q=${encodeURIComponent(bjq)}`;
+  document.getElementById('bjq').textContent=`검색: "${bjq}"`;
+
+  // 초기화
+  document.getElementById('pocaList').innerHTML='<div class="ploading"><div class="pspin"></div>포카마켓 시세 조회 중...</div>';
+  document.getElementById('bjList').innerHTML='<div class="ploading"><div class="pspin"></div>번개장터 조회 중...</div>';
+  document.getElementById('avg').style.display='none';
+
+  document.getElementById('bd').classList.add('open');
+
+  // 병렬 조회
+  fetchPoca(card);
+  fetchBj(card, bjq);
+}
+
+// ── 포카마켓 API ──
+function parseTitle(raw){
+  if(!raw) return '';
+  let t = raw.trim();
+  // "ver.MD" → "MD", "ver.LOVED IVE" → "LOVED IVE"
+  t = t.replace(/^ver\./i, '');
+  // "1DIGIPACK" → "Digipack", "1LOVEDIVE" → "LOVE DIVE"
+  t = t.replace(/^[0-9]+/, '');
+  // "BroadCast" → "BROADCAST"
+  return t.trim();
+}
+
+function buildPocaSearchQ(card){
+  // category → pocamarket 검색 키워드 (대소문자 정확히 매핑)
+  const catQ = CAT_Q[card.category] || CAT_Q[card.category?.toUpperCase()] || card.category || '';
+  const titleQ = parseTitle(card.title);
+  const verQ = parseTitle(card.version);
+  return [catQ, titleQ, verQ].filter(Boolean).join(' ');
+}
+
+async function pocaFetch(url){
+  // 직접 → corsproxy → codetabs 3단계 시도
+  try{ const r=await fetch(url,{headers:{'Accept':'application/json'}}); if(r.ok) return await r.json(); }catch(e){}
+  try{ const r=await fetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`); if(r.ok) return await r.json(); }catch(e){}
+  try{ const r=await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`); if(r.ok) return await r.json(); }catch(e){}
+  return null;
+}
+
+async function fetchPoca(card){
+  const memId=MEM_ID[card.member];
+  const memParam=memId?`&member=${memId}`:'';
+  const searchQ=buildPocaSearchQ(card);
+
+  // 한국 포카마켓 API (api.phocamarket.com) - 원화 시세
+  // 1차: 정확한 검색 (앨범 + title + version)
+  const url1=`${PHOCA_API}?group=${POCA_GROUP}${memParam}&q=${encodeURIComponent(searchQ)}`;
+  let d = await pocaFetch(url1);
+  let results = d?.results||[];
+
+  // 2차: 결과 없으면 앨범 + title만으로 재시도
+  if(!results.length && card.version){
+    const catQ=CAT_Q[card.category]||CAT_Q[card.category?.toUpperCase()]||card.category||'';
+    const titleQ=parseTitle(card.title);
+    const q2=[catQ,titleQ].filter(Boolean).join(' ');
+    const url2=`${PHOCA_API}?group=${POCA_GROUP}${memParam}&q=${encodeURIComponent(q2)}`;
+    d = await pocaFetch(url2);
+    results = d?.results||[];
+  }
+
+  // 3차: 앨범명만으로 (넓은 범위)
+  if(!results.length){
+    const catQ=CAT_Q[card.category]||CAT_Q[card.category?.toUpperCase()]||card.category||'';
+    const url3=`${PHOCA_API}?group=${POCA_GROUP}${memParam}&q=${encodeURIComponent(catQ)}`;
+    d = await pocaFetch(url3);
+    results = d?.results||[];
+  }
+
+  // 4차: 한국 API에 없으면 글로벌(pocamarket.com) 시도
+  if(!results.length){
+    const searchQ=buildPocaSearchQ(card);
+    const globalUrl=`https://pocamarket.com/apis/card/gb/v2/search?group=${POCA_GROUP}${memParam}&q=${encodeURIComponent(searchQ)}&sort=popular&page=1`;
+    const gd = await pocaFetch(globalUrl);
+    if(gd?.data?.results?.length){
+      results = gd.data.results;
+      // 글로벌 결과는 USD → 한국 API와 필드가 다름
+      renderPocaGlobal(results, card);
+      return;
+    }
+  }
+
+  if(!d){
+    document.getElementById('pocaList').innerHTML='<div class="pempty">시세 조회 실패 — 아래 링크에서 직접 확인해 주세요.</div>';
+    return;
+  }
+  renderPoca(results, card);
+}
+
+function renderPoca(items, card){
+  const el=document.getElementById('pocaList');
+  if(!items.length){
+    el.innerHTML='<div class="pempty">포카마켓에서 매물을 찾지 못했어요</div>';
+    return;
+  }
+  const show=items.slice(0,12);
+  el.innerHTML=
+    '<div class="poca-note">👆 사진을 비교해서 같은 카드를 찾아 클릭하세요</div>'+
+    '<div class="poca-grid">'+show.map(item=>{
+    const matchPrice=item.get_matching_price;
+    const sellPrice=item.get_lowest_sell_price;
+    const displayPrice=sellPrice||matchPrice;
+    const priceStr=displayPrice?displayPrice.toLocaleString()+'원':'가격 미정';
+    const matchStr=matchPrice?matchPrice.toLocaleString()+'원':'-';
+    const img=item.image||'';
+    const name=item.name||item.name_en||'';
+    return `<a class="poca-card" href="https://phocamarket.com" target="_blank">
+      <img class="poca-card-img" src="${img}" onerror="this.style.background='#2a1a4e'"/>
+      <div class="poca-card-body">
+        <div class="poca-card-name">${name}</div>
+        <div class="poca-card-price">${priceStr}</div>
+        <div class="poca-card-recent">거래가 ${matchStr}</div>
+        <div class="poca-card-stock">${item.kind?.name||''}</div>
+      </div>
+    </a>`;
+  }).join('')+'</div>';
+}
+
+// ── 번개장터 API (직접 호출) ──
+function buildBjQ(card){
+  const m=MEM_KR[card.member]||card.member||'';
+  const c=CAT_KR[card.category]||CAT_KR[card.category?.toUpperCase()]||card.category||'';
+  const t=getTitle(card);
+  const v=parseTitle(card.version);
+  // "포카" 제거 — 실제 매물에 "포카"가 없는 경우가 많음
+  return ['아이브',c,t,v,m].filter(Boolean).join(' ');
+}
+
+async function fetchBj(card,query){
+  const bjUrl=`https://api.bunjang.co.kr/api/1/find_v2.json?q=${encodeURIComponent(query)}&order=date&page=0&n=10`;
+
+  // 1차: 직접
+  try{
+    const r=await fetch(bjUrl);
+    if(!r.ok)throw new Error(r.status);
+    const d=await r.json();
+    return renderBj(d.list||[],card);
+  }catch(e){}
+
+  // 2차: corsproxy
+  try{
+    const r=await fetch(`https://corsproxy.io/?url=${encodeURIComponent(bjUrl)}`);
+    if(!r.ok)throw new Error(r.status);
+    const d=await r.json();
+    return renderBj(d.list||[],card);
+  }catch(e){}
+
+  // 3차: codetabs
+  try{
+    const r=await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(bjUrl)}`);
+    if(!r.ok)throw new Error(r.status);
+    const d=await r.json();
+    return renderBj(d.list||[],card);
+  }catch(e){
+    document.getElementById('bjList').innerHTML='<div class="pempty">번개장터 연결 실패<br>위 전체보기를 눌러 확인해 주세요</div>';
+  }
+}
+
+// 글로벌 pocamarket 결과 (USD, 필드가 다름)
+function renderPocaGlobal(items, card){
+  const el=document.getElementById('pocaList');
+  if(!items.length){el.innerHTML='<div class="pempty">포카마켓에서 매물을 찾지 못했어요</div>';return;}
+  const show=items.slice(0,12);
+  el.innerHTML=
+    '<div class="poca-note">🌐 글로벌 시세 (USD) · 한국 데이터 없음</div>'+
+    '<div class="poca-grid">'+show.map(item=>{
+    const priceUsd=parseFloat(item.price||0);
+    const img=item.image||'';
+    const name=item.name_en||'';
+    const stock=item.stocked_count||0;
+    return `<a class="poca-card" href="https://pocamarket.com/search/detail/${item.id}" target="_blank">
+      <img class="poca-card-img" src="${img}" onerror="this.style.background='#2a1a4e'"/>
+      <div class="poca-card-body">
+        <div class="poca-card-name">${name}</div>
+        <div class="poca-card-price">$${priceUsd.toFixed(2)}</div>
+        <div class="poca-card-stock">재고 ${stock}개</div>
+      </div>
+    </a>`;
+  }).join('')+'</div>';
+}
+
+function renderBj(items,card){
+  const names=[card.member,MEM_KR[card.member]||''].filter(Boolean).map(n=>n.toLowerCase());
+  const matched=items.filter(i=>names.some(n=>(i.name||'').toLowerCase().includes(n)));
+  const show=matched.length?matched:items;
+
+  if(!show.length){
+    document.getElementById('bjList').innerHTML='<div class="pempty">번개장터 매물 없음<br>포카마켓에서 확인해 보세요</div>';
+    return;
+  }
+  const prices=show.map(i=>parseInt(i.price||0,10)).filter(p=>p>0);
+  if(prices.length){
+    const avg=Math.round(prices.reduce((a,b)=>a+b,0)/prices.length);
+    document.getElementById('avgv').textContent=avg.toLocaleString()+'원';
+    document.getElementById('avgrg').textContent=`${Math.min(...prices).toLocaleString()}원 ~ ${Math.max(...prices).toLocaleString()}원`;
+    document.getElementById('avg').style.display='flex';
+  }
+  document.getElementById('bjList').innerHTML='<div class="bj-grid">'+show.slice(0,12).map(item=>{
+    const price=parseInt(item.price||0).toLocaleString();
+    const img=(item.product_image||'').replace('{res}','480');
+    const date=item.update_time?new Date(item.update_time*1000).toLocaleDateString('ko-KR',{month:'short',day:'numeric'}):'';
+    const isNew=item.used==1;
+    return `<a class="bj-card" href="https://m.bunjang.co.kr/products/${item.pid}" target="_blank">
+      <img class="bj-card-img" src="${img}" onerror="this.style.background='#1a0033'"/>
+      <div class="bj-card-body">
+        <div class="bj-card-name">${item.name||''}</div>
+        <div class="bj-card-price">${price}원</div>
+        <div class="bj-card-date">${date}</div>
+        ${isNew?'<div class="bj-card-new">미개봉</div>':''}
+      </div>
+    </a>`;
+  }).join('')+'</div>';
+}
+
+function closeBd(e){ if(e.target===document.getElementById('bd')) document.getElementById('bd').classList.remove('open'); }
+
+function updateModalBtns(id){
+  id=String(id);
+  const isOwn=owned.has(id), isWish=wish.has(id);
+  const bo=document.getElementById('btnOwn'), bw=document.getElementById('btnWish');
+  bo.textContent=isOwn?'✓ 보유중':'+ 보유';
+  bo.className=`togbtn ${isOwn?'own-on':'no'}`;
+  bw.textContent=isWish?'♡ 위시중':'♡ 위시';
+  bw.className=`togbtn ${isWish?'wish-on':'no'}`;
+}
+
+function togState(type){
+  if(!modalCard)return;
+  const id=String(modalCard.unique_id);
+  if(type==='owned'){
+    if(owned.has(id)){ owned.delete(id); }
+    else { owned.add(id); wish.delete(id); }
+  } else {
+    if(wish.has(id)){ wish.delete(id); }
+    else { wish.add(id); owned.delete(id); }
+  }
+  save(); updateCnt(); updateCard(id); updateModalBtns(id);
+}
+
+// ── 키보드 단축키: 9=보유, 1=위시 ──
+document.addEventListener('keydown', e=>{
+  if(!modalCard) return;
+  const id=String(modalCard.unique_id);
+  if(e.key==='9'){
+    if(owned.has(id)) owned.delete(id); else { owned.add(id); wish.delete(id); }
+    save(); updateCnt(); updateCard(id); updateModalBtns(id);
+  }
+  if(e.key==='1'){
+    if(wish.has(id)) wish.delete(id); else { wish.add(id); owned.delete(id); }
+    save(); updateCnt(); updateCard(id); updateModalBtns(id);
+  }
+});
+
+load();
+</script>
+</body>
+</html>
