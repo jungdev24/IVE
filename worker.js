@@ -90,6 +90,47 @@ export default {
       }
     }
 
+    // /insta/{username} → Instagram embed에서 이미지 추출
+    if (path.startsWith('/insta/')) {
+      const username = path.replace('/insta/', '').replace(/\//g, '');
+      if (!username) {
+        return Response.json({ error: 'username required', images: [] }, { headers: corsHeaders });
+      }
+      try {
+        const embedUrl = `https://www.instagram.com/${username}/embed/`;
+        const resp = await fetch(embedUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+            'Accept': 'text/html,application/xhtml+xml',
+          },
+        });
+        const html = await resp.text();
+
+        // cdninstagram 이미지 URL 추출 (프로필 사진 제외, 게시물만)
+        const imgRegex = /https:\/\/scontent[^"'\s]+?\.cdninstagram\.com\/v\/[^"'\s]+?\.jpg[^"'\s]*/g;
+        const allUrls = html.match(imgRegex) || [];
+
+        // 고해상도(1080)만 필터 + 중복 제거 + 프로필 사진 제외
+        const seen = new Set();
+        const images = [];
+        allUrls.forEach(u => {
+          const clean = u.split('\\u0026').join('&').split('\\').join('');
+          if (clean.includes('/t51.82787-19/')) return; // 프로필 사진 제외
+          // 같은 이미지의 다른 해상도 중복 제거 (파일명 기준)
+          const fname = clean.match(/\/([^/]+)\.jpg/)?.[1] || clean;
+          if (seen.has(fname)) return;
+          seen.add(fname);
+          images.push(clean);
+        });
+
+        return Response.json({ images, count: images.length, source: `@${username}` }, {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (e) {
+        return Response.json({ error: e.message, images: [] }, { headers: corsHeaders });
+      }
+    }
+
     return new Response('IVE Fan App API', { headers: corsHeaders });
   },
 };

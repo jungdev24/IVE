@@ -112,6 +112,7 @@
       <button class="tag-btn on" onclick="filterTag('ALL',this)">전체</button>
       <button class="tag-btn" onclick="filterTag('♡',this)">♡ 즐겨찾기</button>
       <button class="tag-btn" onclick="filterTag('𝕏',this)">𝕏 트위터</button>
+      <button class="tag-btn" onclick="filterTag('📷IG',this)">📷 인스타</button>
       <button class="tag-btn" onclick="filterTag('직접추가',this)">📸 직접추가</button>
     </div>
     <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
@@ -169,9 +170,10 @@
       <button class="settings-save" onclick="addAccount()" style="flex:none;padding:8px 14px;font-size:0.78rem;">추가</button>
     </div>
     <div class="settings-help">
-      <b>@계정</b>: 팬계정 타임라인에서 사진 수집<br>
-      <b>#해시태그</b>: 해시태그 검색으로 사진 수집<br>
-      예: @_yujjin_an, #안유진, #anyujin
+      <b>@계정</b>: X(트위터) 팬계정 타임라인 수집<br>
+      <b>#해시태그</b>: X 해시태그 검색 수집<br>
+      <b>ig:계정</b>: 인스타그램 계정 수집<br>
+      예: @_yujjin_an, #안유진, ig:_yujin_an
     </div>
     <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:12px 0;"/>
     <div class="settings-btns">
@@ -361,7 +363,7 @@ function closeSettings(){ document.getElementById('settings').classList.remove('
 
 // ── X(트위터) 수집 계정 관리 ──
 const WORKER_URL = 'https://ive-api.jungdev24.workers.dev';
-const DEFAULT_ACCOUNTS = ['_yujjin_an','_yujin_an_','IVEstarship','_yoojin_an','#안유진','#anyujin','#아이브안유진'];
+const DEFAULT_ACCOUNTS = ['_yujjin_an','_yujin_an_','IVEstarship','_yoojin_an','#안유진','#anyujin','#아이브안유진','ig:_yujin_an'];
 let xAccounts = JSON.parse(localStorage.getItem('yujin_accounts')||'null') || [...DEFAULT_ACCOUNTS];
 
 function renderAccounts(){
@@ -369,7 +371,7 @@ function renderAccounts(){
   if(!el) return;
   el.innerHTML=xAccounts.map((a,i)=>`
     <div class="acc-item">
-      <span>${a.startsWith('#')?a:'@'+a}</span>
+      <span>${a.startsWith('#')?a:a.startsWith('ig:')? '📷 '+a.slice(3) :'@'+a}</span>
       <button class="acc-del" onclick="removeAccount(${i})" title="삭제">✕</button>
     </div>
   `).join('');
@@ -377,8 +379,10 @@ function renderAccounts(){
 
 function addAccount(){
   let name=document.getElementById('newAccount').value.trim();
-  // @계정은 @ 제거, #해시태그는 유지
+  // @계정은 @ 제거, #해시태그/ig:인스타는 유지
   if(name.startsWith('@')) name=name.slice(1);
+  // 인스타 약식 입력 처리: "인스타:계정" → "ig:계정"
+  if(name.startsWith('인스타:')) name='ig:'+name.slice(4);
   if(!name) return;
   if(xAccounts.includes(name)){ alert('이미 추가된 계정이에요.'); return; }
   xAccounts.push(name);
@@ -406,11 +410,14 @@ async function fetchFromX(){
     gallery.innerHTML=`<div class="fetch-loading"><span class="fspin"></span>𝕏 ${account} 수집 중... (${ai+1}/${xAccounts.length})</div>`;
 
     try{
-      // #해시태그 vs @계정 분기
+      // ig:인스타 / #해시태그 / @계정 분기
+      const isInsta=account.startsWith('ig:');
       const isHash=account.startsWith('#');
-      const apiUrl=isHash
-        ? `${WORKER_URL}/search?q=${encodeURIComponent(account)}`
-        : `${WORKER_URL}/x/${account}`;
+      const apiUrl=isInsta
+        ? `${WORKER_URL}/insta/${account.slice(3)}`
+        : isHash
+          ? `${WORKER_URL}/search?q=${encodeURIComponent(account)}`
+          : `${WORKER_URL}/x/${account}`;
 
       const r=await fetch(apiUrl);
       if(!r.ok) continue;
@@ -422,7 +429,8 @@ async function fetchFromX(){
         if(existingUrls.has(url)) return;
         const id='x_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
         // 자동 태그: 𝕏 + 소스 + 트윗 해시태그 (상위 5개)
-        const autoTags=['𝕏',...tweetTags.slice(0,5)];
+        const srcTag=isInsta?'📷IG':'𝕏';
+        const autoTags=[srcTag,...tweetTags.slice(0,5)];
         const isGif=url.includes('.mp4')||url.includes('tweet_video');
         if(isGif) autoTags.push('GIF');
         photos.unshift({
@@ -438,6 +446,13 @@ async function fetchFromX(){
       console.log('X fetch error:',account,e);
     }
   }
+
+  // 최신순 정렬 (id에 타임스탬프 포함)
+  photos.sort((a,b)=>{
+    const ta=parseInt(a.id.split('_')[1])||0;
+    const tb=parseInt(b.id.split('_')[1])||0;
+    return tb-ta;
+  });
 
   save();
   buildDynTags();
