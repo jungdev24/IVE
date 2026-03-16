@@ -112,7 +112,6 @@
       <button class="tag-btn on" onclick="filterTag('ALL',this)">전체</button>
       <button class="tag-btn" onclick="filterTag('♡',this)">♡ 즐겨찾기</button>
       <button class="tag-btn" onclick="filterTag('𝕏',this)">𝕏 트위터</button>
-      <button class="tag-btn" onclick="filterTag('📷IG',this)">📷 인스타</button>
       <button class="tag-btn" onclick="filterTag('직접추가',this)">📸 직접추가</button>
     </div>
     <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
@@ -172,8 +171,7 @@
     <div class="settings-help">
       <b>@계정</b>: X(트위터) 팬계정 타임라인 수집<br>
       <b>#해시태그</b>: X 해시태그 검색 수집<br>
-      <b>ig:계정</b>: 인스타그램 계정 수집<br>
-      예: @_yujjin_an, #안유진, ig:_yujin_an
+      예: @_yujjin_an, #안유진, #anyujin
     </div>
     <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:12px 0;"/>
     <div class="settings-btns">
@@ -209,7 +207,10 @@ function render(){
   document.getElementById('cnt').textContent=`${filtered.length}장`;
   const g=document.getElementById('gallery');
   if(!filtered.length){
-    g.innerHTML=document.getElementById('emptyState').outerHTML;
+    const msg = curTag==='ALL'
+      ? '𝕏 최신 사진 버튼을 눌러 사진을 가져오세요 💜'
+      : `"${curTag}" 태그에 해당하는 사진이 없어요`;
+    g.innerHTML=`<div class="empty">${msg}</div>`;
     return;
   }
   let h='';
@@ -363,7 +364,7 @@ function closeSettings(){ document.getElementById('settings').classList.remove('
 
 // ── X(트위터) 수집 계정 관리 ──
 const WORKER_URL = 'https://ive-api.jungdev24.workers.dev';
-const DEFAULT_ACCOUNTS = ['_yujjin_an','_yujin_an_','IVEstarship','_yoojin_an','#안유진','#anyujin','#아이브안유진','ig:_yujin_an'];
+const DEFAULT_ACCOUNTS = ['_yujjin_an','_yujin_an_','IVEstarship','_yoojin_an','#안유진','#anyujin','#아이브안유진'];
 let xAccounts = JSON.parse(localStorage.getItem('yujin_accounts')||'null') || [...DEFAULT_ACCOUNTS];
 
 function renderAccounts(){

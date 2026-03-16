@@ -100,30 +100,47 @@ export default {
         const embedUrl = `https://www.instagram.com/${username}/embed/`;
         const resp = await fetch(embedUrl, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-            'Accept': 'text/html,application/xhtml+xml',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+            'Sec-Fetch-Dest': 'iframe',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'cross-site',
+            'Referer': 'https://www.google.com/',
           },
+          redirect: 'follow',
         });
         const html = await resp.text();
+        const htmlLen = html.length;
 
-        // cdninstagram 이미지 URL 추출 (프로필 사진 제외, 게시물만)
-        const imgRegex = /https:\/\/scontent[^"'\s]+?\.cdninstagram\.com\/v\/[^"'\s]+?\.jpg[^"'\s]*/g;
-        const allUrls = html.match(imgRegex) || [];
+        // cdninstagram 이미지 URL 추출 - 이스케이프 문자 처리
+        // HTML에서 URL이 \" 또는 \u0026 등으로 이스케이프됨
+        const unescaped = html.replace(/\\u0026/g, '&').replace(/\\\//g, '/').replace(/\\"/g, '"');
 
-        // 고해상도(1080)만 필터 + 중복 제거 + 프로필 사진 제외
+        const imgRegex = /https:\/\/scontent[a-z0-9-]*\.cdninstagram\.com\/v\/t51\.82787-15\/[^"'\s\\)]+\.jpg[^"'\s\\)]*/g;
+        const allUrls = unescaped.match(imgRegex) || [];
+
+        // 고해상도만 + 중복 제거
         const seen = new Set();
         const images = [];
         allUrls.forEach(u => {
-          const clean = u.split('\\u0026').join('&').split('\\').join('');
-          if (clean.includes('/t51.82787-19/')) return; // 프로필 사진 제외
-          // 같은 이미지의 다른 해상도 중복 제거 (파일명 기준)
-          const fname = clean.match(/\/([^/]+)\.jpg/)?.[1] || clean;
-          if (seen.has(fname)) return;
+          // 파일명으로 중복 제거
+          const fname = u.match(/\/([A-Za-z0-9_]+)_[0-9]+_[0-9]+_n\.jpg/)?.[1]
+            || u.match(/\/([^/]+)\.jpg/)?.[1] || '';
+          if (!fname || seen.has(fname)) return;
           seen.add(fname);
-          images.push(clean);
+          // 고해상도 우선 (1080 포함 URL)
+          if (u.includes('p1080x') || u.includes('e35_p')) {
+            images.unshift(u);
+          } else {
+            images.push(u);
+          }
         });
 
-        return Response.json({ images, count: images.length, source: `@${username}` }, {
+        return Response.json({
+          images, count: images.length, source: `ig:${username}`,
+          debug: { htmlLen, rawMatches: allUrls.length }
+        }, {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } catch (e) {
