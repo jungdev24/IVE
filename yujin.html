@@ -369,7 +369,7 @@ function renderAccounts(){
   if(!el) return;
   el.innerHTML=xAccounts.map((a,i)=>`
     <div class="acc-item">
-      <span>@${a}</span>
+      <span>${a.startsWith('#')?a:'@'+a}</span>
       <button class="acc-del" onclick="removeAccount(${i})" title="삭제">✕</button>
     </div>
   `).join('');
