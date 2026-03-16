@@ -77,24 +77,21 @@
     .settings-box{background:#140028;border:1px solid rgba(124,77,255,0.3);border-radius:16px;padding:24px 20px;max-width:420px;width:100%;}
     .settings-title{font-size:1rem;font-weight:700;margin-bottom:14px;}
     .settings-label{font-size:0.72rem;color:rgba(255,255,255,0.4);margin-bottom:4px;}
-    .settings-input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:8px;padding:8px 12px;color:#fff;font-size:0.82rem;outline:none;margin-bottom:12px;}
-    .settings-input::placeholder{color:rgba(255,255,255,0.25);}
     .settings-help{font-size:0.65rem;color:rgba(255,255,255,0.25);line-height:1.5;margin-bottom:14px;}
-    .settings-help a{color:#ce93d8;}
+    .acc-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:rgba(255,255,255,0.04);border-radius:7px;margin-bottom:4px;font-size:0.78rem;}
+    .acc-item span{color:rgba(255,255,255,0.7);}
+    .acc-del{background:none;border:none;color:rgba(255,80,80,0.6);font-size:0.85rem;cursor:pointer;padding:0 4px;}
+    .acc-del:hover{color:#ff4040;}
     .settings-btns{display:flex;gap:8px;}
     .settings-save{flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--p),var(--pk));color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;}
     .settings-cancel{padding:10px 16px;border:1px solid rgba(255,255,255,0.15);border-radius:10px;background:none;color:rgba(255,255,255,0.5);font-size:0.85rem;cursor:pointer;}
-    .settings-status{font-size:0.7rem;margin-top:10px;text-align:center;}
-    .settings-status.ok{color:#69f0ae;}
-    .settings-status.err{color:#ff8a80;}
 
     /* 로딩 */
     .fetch-loading{text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:0.8rem;}
     .fspin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.1);border-top-color:#ce93d8;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px;}
     @keyframes sp{to{transform:rotate(360deg);}}
 
-    @media(max-width:600px){.gallery{column-count:2;}}
-    @media(min-width:900px){.gallery{column-count:4;}}
+    /* 크기 조절은 JS로 처리 */
   </style>
 </head>
 <body>
@@ -108,16 +105,19 @@
     </div>
   </div>
   <div class="search-row">
-    <button class="fetch-btn" onclick="fetchFromX()" style="background:linear-gradient(135deg,#1d9bf0,#0d8bd9)">𝕏 최신 사진</button>
-    <input id="searchQ" placeholder="네이버 검색어" value="아이브 안유진" style="flex:1"/>
-    <button class="fetch-btn" onclick="fetchImages()">🔍 네이버</button>
+    <button class="fetch-btn" onclick="fetchFromX()" style="background:linear-gradient(135deg,#1d9bf0,#0d8bd9);flex:1">𝕏 최신 사진 가져오기</button>
   </div>
-  <div class="tabs" id="tagFilter">
-    <button class="tag-btn on" onclick="filterTag('ALL',this)">전체</button>
-    <button class="tag-btn" onclick="filterTag('♡',this)">♡ 즐겨찾기</button>
-    <button class="tag-btn" onclick="filterTag('𝕏',this)">𝕏 트위터</button>
-    <button class="tag-btn" onclick="filterTag('네이버',this)">🔍 네이버</button>
-    <button class="tag-btn" onclick="filterTag('직접추가',this)">📸 직접추가</button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+    <div class="tabs" id="tagFilter" style="flex:1;">
+      <button class="tag-btn on" onclick="filterTag('ALL',this)">전체</button>
+      <button class="tag-btn" onclick="filterTag('♡',this)">♡ 즐겨찾기</button>
+      <button class="tag-btn" onclick="filterTag('𝕏',this)">𝕏 트위터</button>
+      <button class="tag-btn" onclick="filterTag('직접추가',this)">📸 직접추가</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
+      <span style="font-size:0.6rem;color:rgba(255,255,255,0.3);">크기</span>
+      <input type="range" id="sizeSlider" min="2" max="6" value="3" oninput="setColumns(this.value)" style="width:60px;accent-color:#7c4dff;"/>
+    </div>
   </div>
 </header>
 
@@ -152,28 +152,32 @@
   <button class="viewer-nav next" onclick="navViewer(1)">›</button>
   <img id="viewerImg" src=""/>
   <div class="viewer-info" id="viewerInfo"></div>
+  <div style="margin-top:8px;display:flex;gap:6px;align-items:center;">
+    <input id="viewerTagInput" placeholder="태그 추가 (쉼표 구분)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 10px;color:#fff;font-size:0.75rem;outline:none;width:200px;"/>
+    <button onclick="addTagToViewer()" style="background:linear-gradient(135deg,#7c4dff,#ff4081);border:none;border-radius:8px;padding:6px 12px;color:#fff;font-size:0.72rem;font-weight:700;cursor:pointer;">태그 저장</button>
+  </div>
 </div>
 
 <!-- 설정 -->
 <div class="settings" id="settings" onclick="if(event.target===this)closeSettings()">
   <div class="settings-box">
-    <div class="settings-title">⚙️ 네이버 API 설정</div>
-    <div class="settings-label">Client ID</div>
-    <input class="settings-input" id="naverCid" placeholder="네이버 Client ID 입력"/>
-    <div class="settings-label">Client Secret</div>
-    <input class="settings-input" id="naverCsec" placeholder="네이버 Client Secret 입력"/>
+    <div class="settings-title">⚙️ 수집 계정 관리</div>
+    <div class="settings-label">X(트위터) 계정 목록</div>
+    <div id="accountList" style="margin-bottom:10px;"></div>
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <input class="settings-input" id="newAccount" placeholder="@계정명 또는 #해시태그" style="margin-bottom:0;flex:1;font-size:0.78rem;"/>
+      <button class="settings-save" onclick="addAccount()" style="flex:none;padding:8px 14px;font-size:0.78rem;">추가</button>
+    </div>
     <div class="settings-help">
-      무료 발급 방법:<br>
-      1. <a href="https://developers.naver.com/apps/#/register" target="_blank">네이버 개발자 센터</a> 접속 → 로그인<br>
-      2. 애플리케이션 등록 → 사용 API: <b>검색</b> 선택<br>
-      3. 환경: <b>WEB</b> → URL에 <b>https://ive-fan-app.pages.dev</b> 입력<br>
-      4. 발급된 Client ID와 Secret을 여기에 붙여넣기
+      <b>@계정</b>: 팬계정 타임라인에서 사진 수집<br>
+      <b>#해시태그</b>: 해시태그 검색으로 사진 수집<br>
+      예: @_yujjin_an, #안유진, #anyujin
     </div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:12px 0;"/>
     <div class="settings-btns">
-      <button class="settings-cancel" onclick="closeSettings()">취소</button>
-      <button class="settings-save" onclick="saveSettings()">저장</button>
+      <button class="settings-cancel" onclick="closeSettings()">닫기</button>
+      <button class="settings-save" onclick="if(confirm('모든 사진을 삭제할까요?')){photos=[];favs.clear();save();render();closeSettings()}" style="background:#ff4040;">사진 전체 삭제</button>
     </div>
-    <div class="settings-status" id="settingsStatus"></div>
   </div>
 </div>
 
@@ -185,9 +189,13 @@ let curTag = 'ALL';
 let viewIdx = 0;
 let filtered = [];
 
-// ── 네이버 API 키 ──
-let naverCid = localStorage.getItem('naver_cid')||'';
-let naverCsec = localStorage.getItem('naver_csec')||'';
+// ── 크기 조절 ──
+let colCount = parseInt(localStorage.getItem('yujin_cols')||'3');
+function setColumns(n){
+  colCount=parseInt(n);
+  localStorage.setItem('yujin_cols',colCount);
+  document.getElementById('gallery').style.columnCount=colCount;
+}
 
 // ── 렌더 ──
 function render(){
@@ -209,14 +217,17 @@ function render(){
     const src=p.src?`<div class="info-src">${p.src}</div>`:'';
     // URL 기반 이미지 또는 base64
     const imgSrc=p.url||p.data||'';
+    const isVid=imgSrc.endsWith('.mp4');
     h+=`<div class="gallery-item" onclick="openViewer(${i})">
-      <img src="${imgSrc}" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+      ${isVid
+        ?`<video src="${imgSrc}" muted loop playsinline onmouseenter="this.play()" onmouseleave="this.pause()" style="width:100%;display:block;"></video>`
+        :`<img src="${imgSrc}" loading="lazy" onerror="this.parentElement.style.display='none'"/>`
+      }
       <div class="fav ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${p.id}',this)">♡</div>
       <div class="del-btn" onclick="event.stopPropagation();delPhoto('${p.id}')">✕</div>
       <div class="info">
-        <div class="info-date">${p.date||''}</div>
+        <div class="info-date">${p.date||''} ${p.src?'· '+p.src:''}</div>
         <div class="info-tags">${tags}</div>
-        ${src}
       </div>
     </div>`;
   });
@@ -293,10 +304,35 @@ function openViewer(i){ viewIdx=i; showViewer(); }
 function showViewer(){
   if(!filtered[viewIdx]) return;
   const p=filtered[viewIdx];
-  document.getElementById('viewerImg').src=p.url||p.data||'';
+  const src=p.url||p.data||'';
+  const vImg=document.getElementById('viewerImg');
+  if(src.endsWith('.mp4')){
+    vImg.outerHTML=`<video id="viewerImg" src="${src}" autoplay loop muted playsinline style="max-width:95vw;max-height:85vh;border-radius:8px;"></video>`;
+  } else {
+    const el=document.getElementById('viewerImg');
+    if(el.tagName==='VIDEO') el.outerHTML=`<img id="viewerImg" src="${src}" style="max-width:95vw;max-height:85vh;object-fit:contain;border-radius:8px;"/>`;
+    else el.src=src;
+  }
   const tags=(p.tags||[]).join(', ');
-  document.getElementById('viewerInfo').textContent=`${p.date||''}${tags?' · '+tags:''}  (${viewIdx+1}/${filtered.length})`;
+  document.getElementById('viewerInfo').textContent=`${p.date||''}${p.src?' · '+p.src:''}${tags?' · '+tags:''}  (${viewIdx+1}/${filtered.length})`;
+  document.getElementById('viewerTagInput').value=(p.tags||[]).filter(t=>t!=='𝕏'&&t!=='직접추가').join(', ');
   document.getElementById('viewer').classList.add('open');
+}
+
+function addTagToViewer(){
+  if(!filtered[viewIdx]) return;
+  const p=filtered[viewIdx];
+  const input=document.getElementById('viewerTagInput').value.trim();
+  const newTags=input?input.split(',').map(t=>t.trim()).filter(Boolean):[];
+  // 기존 시스템 태그 유지 + 새 태그
+  const sysTags=(p.tags||[]).filter(t=>t==='𝕏'||t==='직접추가');
+  p.tags=[...sysTags,...newTags];
+  // photos 배열에서도 업데이트
+  const orig=photos.find(pp=>pp.id===p.id);
+  if(orig) orig.tags=p.tags;
+  save(); render();
+  // 태그 필터 버튼 갱신
+  buildDynTags();
 }
 function closeViewer(){ document.getElementById('viewer').classList.remove('open'); }
 function navViewer(dir){ viewIdx=(viewIdx+dir+filtered.length)%filtered.length; showViewer(); }
@@ -320,55 +356,81 @@ function save(){
 }
 
 // ── 설정 ──
-function openSettings(){
-  document.getElementById('naverCid').value=naverCid;
-  document.getElementById('naverCsec').value=naverCsec;
-  document.getElementById('settingsStatus').textContent='';
-  document.getElementById('settings').classList.add('open');
-}
+function openSettings(){ renderAccounts(); document.getElementById('settings').classList.add('open'); }
 function closeSettings(){ document.getElementById('settings').classList.remove('open'); }
-function saveSettings(){
-  naverCid=document.getElementById('naverCid').value.trim();
-  naverCsec=document.getElementById('naverCsec').value.trim();
-  localStorage.setItem('naver_cid',naverCid);
-  localStorage.setItem('naver_csec',naverCsec);
-  const st=document.getElementById('settingsStatus');
-  if(naverCid&&naverCsec){
-    st.textContent='✅ 저장 완료! 이제 검색 버튼을 눌러보세요.';
-    st.className='settings-status ok';
-  } else {
-    st.textContent='❌ Client ID와 Secret을 모두 입력해 주세요.';
-    st.className='settings-status err';
-  }
+
+// ── X(트위터) 수집 계정 관리 ──
+const WORKER_URL = 'https://ive-api.jungdev24.workers.dev';
+const DEFAULT_ACCOUNTS = ['_yujjin_an','_yujin_an_','IVEstarship','_yoojin_an','#안유진','#anyujin','#아이브안유진'];
+let xAccounts = JSON.parse(localStorage.getItem('yujin_accounts')||'null') || [...DEFAULT_ACCOUNTS];
+
+function renderAccounts(){
+  const el=document.getElementById('accountList');
+  if(!el) return;
+  el.innerHTML=xAccounts.map((a,i)=>`
+    <div class="acc-item">
+      <span>@${a}</span>
+      <button class="acc-del" onclick="removeAccount(${i})" title="삭제">✕</button>
+    </div>
+  `).join('');
 }
 
-// ── X(트위터) 사진 가져오기 (Cloudflare Worker 경유) ──
-const WORKER_URL = 'https://ive-api.jungdev24.workers.dev';
-const X_ACCOUNTS = [
-  '_yujjin_an',    // 유진 팬계정
-  '_yujin_an_',    // 유진 팬계정 2
-  'IVEstarship',   // IVE 공식
-];
+function addAccount(){
+  let name=document.getElementById('newAccount').value.trim();
+  // @계정은 @ 제거, #해시태그는 유지
+  if(name.startsWith('@')) name=name.slice(1);
+  if(!name) return;
+  if(xAccounts.includes(name)){ alert('이미 추가된 계정이에요.'); return; }
+  xAccounts.push(name);
+  localStorage.setItem('yujin_accounts',JSON.stringify(xAccounts));
+  document.getElementById('newAccount').value='';
+  renderAccounts();
+}
+
+function removeAccount(i){
+  xAccounts.splice(i,1);
+  localStorage.setItem('yujin_accounts',JSON.stringify(xAccounts));
+  renderAccounts();
+}
 
 async function fetchFromX(){
   const gallery=document.getElementById('gallery');
-  gallery.innerHTML='<div class="fetch-loading"><span class="fspin"></span>𝕏 에서 안유진 사진 가져오는 중...</div>';
+  gallery.innerHTML='<div class="fetch-loading"><span class="fspin"></span>𝕏 에서 안유진 사진 가져오는 중... (0/${xAccounts.length})</div>';
 
   const existingUrls=new Set(photos.map(p=>p.url).filter(Boolean));
   let totalAdded=0;
   const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'});
 
-  for(const account of X_ACCOUNTS){
+  for(let ai=0;ai<xAccounts.length;ai++){
+    const account=xAccounts[ai];
+    gallery.innerHTML=`<div class="fetch-loading"><span class="fspin"></span>𝕏 ${account} 수집 중... (${ai+1}/${xAccounts.length})</div>`;
+
     try{
-      const r=await fetch(`${WORKER_URL}/x/${account}`);
+      // #해시태그 vs @계정 분기
+      const isHash=account.startsWith('#');
+      const apiUrl=isHash
+        ? `${WORKER_URL}/search?q=${encodeURIComponent(account)}`
+        : `${WORKER_URL}/x/${account}`;
+
+      const r=await fetch(apiUrl);
       if(!r.ok) continue;
       const data=await r.json();
       const images=data.images||[];
+      const tweetTags=data.tags||[]; // 트윗에서 추출한 해시태그
 
       images.forEach(url=>{
         if(existingUrls.has(url)) return;
         const id='x_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-        photos.unshift({ id, url, tags:['𝕏'], date, src:`@${account}` });
+        // 자동 태그: 𝕏 + 소스 + 트윗 해시태그 (상위 5개)
+        const autoTags=['𝕏',...tweetTags.slice(0,5)];
+        const isGif=url.includes('.mp4')||url.includes('tweet_video');
+        if(isGif) autoTags.push('GIF');
+        photos.unshift({
+          id, url,
+          tags:[...new Set(autoTags)],
+          date,
+          src: isHash?account:`@${account}`,
+        });
         existingUrls.add(url);
         totalAdded++;
       });
@@ -378,80 +440,35 @@ async function fetchFromX(){
   }
 
   save();
+  buildDynTags();
   render();
 
   if(totalAdded===0) alert('새로운 사진이 없어요. 이미 최신 상태입니다!');
-  else gallery.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── 네이버 이미지 검색 ──
-async function fetchImages(){
-  if(!naverCid||!naverCsec){
-    openSettings();
-    return;
-  }
-  const query=document.getElementById('searchQ').value.trim()||'아이브 안유진';
-  const gallery=document.getElementById('gallery');
-  gallery.innerHTML='<div class="fetch-loading"><span class="fspin"></span>네이버에서 이미지 검색 중...</div>';
 
-  let data=null;
-
-  // Cloudflare Worker 경유 (CORS 문제 없음)
-  try{
-    const r=await fetch(`${WORKER_URL}/naver?q=${encodeURIComponent(query)}&cid=${encodeURIComponent(naverCid)}&csec=${encodeURIComponent(naverCsec)}`);
-    if(r.ok) data=await r.json();
-  }catch(e){}
-
-  // 폴백: 직접 호출
-  if(!data){
-    try{
-      const apiUrl=`https://openapi.naver.com/v1/search/image?query=${encodeURIComponent(query)}&display=30&sort=date`;
-      const r=await fetch(apiUrl,{headers:{'X-Naver-Client-Id':naverCid,'X-Naver-Client-Secret':naverCsec}});
-      if(r.ok) data=await r.json();
-    }catch(e){}
-  }
-
-  if(!data||!data.items){
-    gallery.innerHTML='<div class="fetch-loading">검색 실패 — API 키를 확인하거나 잠시 후 다시 시도해 주세요.</div>';
-    return;
-  }
-
-  // 기존에 있는 URL 중복 방지
-  const existingUrls=new Set(photos.map(p=>p.url).filter(Boolean));
-  const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'});
-  let added=0;
-
-  data.items.forEach(item=>{
-    const url=item.link||item.thumbnail||'';
-    if(!url||existingUrls.has(url)) return;
-    const id='nv_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-    const title=(item.title||'').replace(/<[^>]*>/g,'');
-    photos.unshift({
-      id,
-      url,
-      tags:['네이버'],
-      date,
-      src: title.slice(0,40),
-    });
-    existingUrls.add(url);
-    added++;
+// ── 동적 태그 탭 ──
+function buildDynTags(){
+  const container=document.getElementById('tagFilter');
+  container.querySelectorAll('.tag-dyn').forEach(b=>b.remove());
+  const allTags=new Set();
+  photos.forEach(p=>(p.tags||[]).forEach(t=>{
+    if(t!=='𝕏'&&t!=='직접추가') allTags.add(t);
+  }));
+  allTags.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='tag-btn tag-dyn';
+    b.textContent=t;
+    b.onclick=()=>filterTag(t,b);
+    container.appendChild(b);
   });
-
-  save();
-  render();
-
-  if(added===0){
-    alert('새로운 이미지가 없어요. 다른 검색어를 시도해 보세요!');
-  }
 }
 
 // ── 시작 ──
+document.getElementById('sizeSlider').value=colCount;
+setColumns(colCount);
+buildDynTags();
 render();
-
-// API 키가 있으면 자동으로 최신 이미지 로드
-if(naverCid && naverCsec && photos.length===0){
-  fetchImages();
-}
 </script>
 </body>
 </html>
