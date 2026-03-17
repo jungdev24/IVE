@@ -78,11 +78,12 @@
   <div class="start" id="startScreen">
     <div class="start-emoji">💜</div>
     <div class="start-title">IVE 퀴즈 챌린지</div>
-    <div class="start-sub">총 50문제 중 랜덤으로 출제됩니다<br>당신은 진정한 DIVE인가요?</div>
+    <div class="start-sub">총 100문제 중 랜덤으로 출제됩니다<br>당신은 진정한 DIVE인가요?</div>
     <div class="mode-btns">
       <button class="mode-btn on" id="m10" onclick="setMode(10)">10문제</button>
       <button class="mode-btn" id="m20" onclick="setMode(20)">20문제</button>
       <button class="mode-btn" id="m50" onclick="setMode(50)">50문제</button>
+      <button class="mode-btn" id="m100" onclick="setMode(100)">100문제</button>
     </div>
     <button class="start-btn" onclick="startQuiz()">시작하기</button>
   </div>
@@ -184,6 +185,65 @@ const ALL_QUESTIONS = [
   {q:"'ELEVEN'은 음악방송에서 총 몇 관왕을 기록했나요?", o:["13관왕","10관왕","7관왕","15관왕"], a:0, e:"데뷔곡 ELEVEN은 음악방송 13관왕을 기록했어요."},
   {q:"IVE가 골든디스크에서 최초로 동시에 수상한 두 개의 상은?", o:["신인상 + 대상","신인상 + 본상","본상 + 대상","인기상 + 대상"], a:0, e:"제37회 골든디스크어워즈에서 신인상과 대상을 동시 수상한 역사상 유일한 아티스트예요."},
   {q:"IVE의 평균 신장은 약 몇 cm인가요?", o:["169cm","165cm","172cm","167cm"], a:0, e:"평균 신장 약 169.3cm로 '키다리돌'이라 불려요."},
+
+  // ── 음악 심화 ──
+  {q:"'After LIKE'는 음악방송 몇 관왕을 기록했나요?", o:["14관왕","10관왕","13관왕","8관왕"], a:0, e:"After LIKE는 음악방송 14관왕을 기록했어요."},
+  {q:"'After LIKE'에 샘플링된 올디스 곡은?", o:["I Will Survive","Dancing Queen","Stayin' Alive","YMCA"], a:0, e:"글로리아 게이너의 'I Will Survive'가 샘플링됐어요."},
+  {q:"IVE의 첫 번째 EP(미니앨범) 이름은?", o:["I've MINE","I've IVE","IVE SWITCH","IVE EMPATHY"], a:0, e:"2023년 발매된 'I've MINE'이 첫 EP예요."},
+  {q:"IVE의 두 번째 EP 이름은?", o:["IVE SWITCH","I've MINE","IVE EMPATHY","IVE SECRET"], a:0, e:"2024년 발매된 'IVE SWITCH'가 두 번째 EP예요."},
+  {q:"IVE의 세 번째 EP 이름은?", o:["IVE EMPATHY","IVE SECRET","IVE SWITCH","REVIVE+"], a:0, e:"2025년 발매된 'IVE EMPATHY'가 세 번째 EP예요."},
+  {q:"IVE의 네 번째 EP 이름은?", o:["IVE SECRET","IVE EMPATHY","REVIVE+","I've MINE"], a:0, e:"2025년 발매된 'IVE SECRET'이 네 번째 EP예요."},
+  {q:"'Kitsch'가 수록된 앨범은?", o:["I've IVE","I've MINE","IVE SWITCH","ELEVEN"], a:0, e:"Kitsch는 첫 정규앨범 'I've IVE'의 타이틀곡이에요."},
+  {q:"'I AM'이 수록된 앨범은?", o:["I've IVE","IVE SWITCH","IVE EMPATHY","REVIVE+"], a:0, e:"I AM은 첫 정규앨범 'I've IVE'의 더블 타이틀곡이에요."},
+  {q:"'REBEL HEART'가 수록된 앨범은?", o:["IVE EMPATHY","IVE SECRET","REVIVE+","IVE SWITCH"], a:0, e:"REBEL HEART는 세 번째 EP 'IVE EMPATHY'의 타이틀곡이에요."},
+  {q:"'REVIVE+' 앨범의 선공개 싱글은?", o:["BANG BANG","Blackhole","REBEL HEART","HEYA"], a:0, e:"REVIVE+의 선공개 더블 타이틀곡은 'BANG BANG'이에요."},
+  {q:"'REVIVE+' 앨범의 리드 싱글은?", o:["Blackhole","BANG BANG","REBEL HEART","Attitude"], a:0, e:"REVIVE+의 리드 싱글은 'Blackhole'이에요."},
+  {q:"IVE의 첫 일본 EP 이름은?", o:["Wave","Alive","Be Alright","ELEVEN JP"], a:0, e:"2024년 발매된 'Wave'가 첫 일본 EP예요."},
+  {q:"IVE의 첫 PAK(Perfect All-Kill)을 달성한 곡은?", o:["LOVE DIVE","ELEVEN","After LIKE","Kitsch"], a:0, e:"LOVE DIVE가 IVE의 첫 PAK을 달성했어요."},
+  {q:"IVE가 PAK을 달성한 총 곡 수는?", o:["5곡","3곡","4곡","6곡"], a:0, e:"IVE는 걸그룹 최다 PAK 5곡을 보유하고 있어요."},
+
+  // ── 멤버 심화 ──
+  {q:"안유진의 혈액형은?", o:["A형","B형","O형","AB형"], a:0, e:"안유진의 혈액형은 A형이에요."},
+  {q:"안유진의 대표색은?", o:["마젠타","다크블루","초록","빨강"], a:0, e:"안유진의 대표색은 마젠타예요."},
+  {q:"안유진의 별자리는?", o:["처녀자리","천칭자리","물병자리","물고기자리"], a:0, e:"안유진은 9월 1일생으로 처녀자리예요."},
+  {q:"장원영의 키는?", o:["173cm","170cm","175cm","168cm"], a:0, e:"장원영의 키는 173cm으로 유진과 같아요."},
+  {q:"장원영의 대표색은?", o:["빨강","마젠타","노랑","사이안"], a:0, e:"장원영의 대표색은 빨강이에요."},
+  {q:"장원영이 능통한 외국어는?", o:["영어","일본어","중국어","프랑스어"], a:0, e:"장원영은 영어에 능통해요."},
+  {q:"가을의 MBTI는?", o:["ISTJ","ISTP","ENTJ","INFJ"], a:0, e:"가을의 MBTI는 ISTJ예요."},
+  {q:"가을의 혈액형은?", o:["B형","A형","O형","AB형"], a:0, e:"가을의 혈액형은 B형이에요."},
+  {q:"가을의 대표색은?", o:["다크블루","마젠타","빨강","노랑"], a:0, e:"가을의 대표색은 다크블루예요."},
+  {q:"가을의 포지션은?", o:["메인 댄서, 리드 래퍼","메인 보컬","메인 래퍼","리드 보컬"], a:0, e:"가을은 메인 댄서이자 리드 래퍼예요."},
+  {q:"레이의 혈액형은?", o:["A형","B형","O형","AB형"], a:0, e:"레이의 혈액형은 A형이에요."},
+  {q:"레이의 대표색은?", o:["초록","빨강","노랑","사이안"], a:0, e:"레이의 대표색은 초록이에요."},
+  {q:"레이가 스타쉽에 입사하게 된 계기는?", o:["일본 글로벌 오디션 합격","길거리 캐스팅","댄스 대회","지인 소개"], a:0, e:"레이는 2018년 Loen Friends 글로벌 오디션에서 합격했어요."},
+  {q:"레이의 별자리는?", o:["물병자리","처녀자리","천칭자리","물고기자리"], a:0, e:"레이는 2월 3일생으로 물병자리예요."},
+  {q:"리즈의 생일은?", o:["11월 21일","11월 1일","9월 24일","2월 3일"], a:0, e:"리즈는 2004년 11월 21일생이에요."},
+  {q:"리즈의 별자리는?", o:["전갈자리","처녀자리","물병자리","물고기자리"], a:0, e:"리즈는 11월 21일생으로 전갈자리예요."},
+  {q:"리즈의 대표색은?", o:["사이안","마젠타","초록","빨강"], a:0, e:"리즈의 대표색은 사이안이에요."},
+  {q:"리즈가 스타쉽에 입사한 방법은?", o:["공개 오디션","스카우트","댄스 대회","지인 소개"], a:0, e:"리즈는 2019년 공개 오디션을 통해 입사했어요."},
+  {q:"이서의 키는?", o:["165cm","170cm","164cm","168cm"], a:0, e:"이서의 키는 165cm이에요."},
+  {q:"이서의 혈액형은?", o:["O형","A형","B형","AB형"], a:0, e:"이서의 혈액형은 O형이에요."},
+  {q:"이서의 대표색은?", o:["노랑","빨강","마젠타","초록"], a:0, e:"이서의 대표색은 노랑이에요."},
+  {q:"이서의 별자리는?", o:["물고기자리","물병자리","처녀자리","천칭자리"], a:0, e:"이서는 2월 21일생으로 물고기자리예요."},
+  {q:"이서의 취미는?", o:["디저트·향수 수집","그림 그리기","피아노","독서"], a:0, e:"이서는 디저트와 향수 수집을 좋아해요."},
+
+  // ── 수상/기록 심화 ──
+  {q:"'LOVE DIVE'는 음악방송 몇 관왕?", o:["10관왕","13관왕","8관왕","15관왕"], a:0, e:"LOVE DIVE는 음악방송 10관왕을 기록했어요."},
+  {q:"'Attitude'는 음악방송 몇 관왕?", o:["15관왕","10관왕","13관왕","8관왕"], a:0, e:"Attitude는 음악방송 15관왕을 기록했어요."},
+  {q:"IVE가 데뷔 후 첫 음악방송 1위를 한 프로그램은?", o:["쇼챔피언","인기가요","뮤직뱅크","엠카운트다운"], a:0, e:"데뷔 1주 만에 쇼챔피언에서 첫 1위를 했어요."},
+  {q:"IVE가 밀리언셀러를 달성한 첫 앨범은?", o:["I've IVE","IVE SWITCH","IVE EMPATHY","REVIVE+"], a:0, e:"첫 정규 'I've IVE'로 밀리언셀러를 달성했어요."},
+  {q:"IVE가 MAMA에서 올해의 노래상을 받은 곡은?", o:["LOVE DIVE","ELEVEN","After LIKE","I AM"], a:0, e:"2022년 MAMA에서 LOVE DIVE로 올해의 노래상을 수상했어요."},
+  {q:"IVE의 첫 번째 월드투어 이름은?", o:["SHOW WHAT I HAVE","SHOW WHAT I AM","DIVE INTO IVE","IVE WORLD"], a:0, e:"첫 월드투어는 'SHOW WHAT I HAVE'예요."},
+  {q:"IVE의 두 번째 월드투어 이름은?", o:["SHOW WHAT I AM","SHOW WHAT I HAVE","IVE SCOUT","DIVE TOUR"], a:0, e:"두 번째 월드투어는 'SHOW WHAT I AM'이에요."},
+
+  // ── 활동/예능 ──
+  {q:"IVE의 공식 유튜브 예능 이름은?", o:["아이브랜드","아이브로그","다이브TV","IVE TIME"], a:0, e:"IVE의 자체 예능은 '아이브랜드'예요."},
+  {q:"IVE 멤버들의 공식 캐릭터 이름은?", o:["미니브(MINIVE)","아이비(IVEY)","다이비(DIVEY)","러비(LOVEY)"], a:0, e:"IVE의 공식 캐릭터는 미니브(MINIVE)예요."},
+  {q:"스타쉽엔터테인먼트의 모회사는?", o:["카카오엔터테인먼트","하이브","SM","CJ ENM"], a:0, e:"스타쉽은 카카오엔터테인먼트 산하 레이블이에요."},
+  {q:"IVE가 속했던 프로젝트 그룹 IZ*ONE의 소속사는?", o:["오프더레코드","스타쉽","플레디스","스윙"], a:0, e:"IZ*ONE은 오프더레코드 소속이었어요."},
+  {q:"안유진과 장원영이 IZ*ONE 활동 후 IVE로 데뷔하기까지 걸린 기간은?", o:["약 8개월","약 1년","약 3개월","약 2년"], a:0, e:"IZ*ONE 해체(2021.4)부터 IVE 데뷔(2021.12)까지 약 8개월이에요."},
+  {q:"IVE 멤버 중 피아노를 잘 치는 멤버 2명은?", o:["장원영, 리즈","안유진, 가을","레이, 이서","리즈, 이서"], a:0, e:"장원영과 리즈가 피아노 실력이 우수해요."},
+  {q:"IVE SWITCH 앨범의 물리적 버전이 아닌 것은?", o:["REPLAY","ON","OFF","SPIN-OFF"], a:0, e:"IVE SWITCH는 ON, OFF, SPIN-OFF, Loved IVE 4가지 버전이에요."},
 ];
 
 let mode=10, questions=[], qi=0, score=0, answered=false;
