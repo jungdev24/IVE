@@ -363,7 +363,7 @@ function openSettings(){ renderAccounts(); document.getElementById('settings').c
 function closeSettings(){ document.getElementById('settings').classList.remove('open'); }
 
 // ── X(트위터) 수집 계정 관리 ──
-const WORKER_URL = 'https://ive-api.jungdev24.workers.dev';
+const WORKER_URL = '';
 const DEFAULT_ACCOUNTS = ['_yujjin_an','_yujin_an_','IVEstarship','_yoojin_an','#안유진','#anyujin','#아이브안유진'];
 let xAccounts = JSON.parse(localStorage.getItem('yujin_accounts')||'null') || [...DEFAULT_ACCOUNTS];
 

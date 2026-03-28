@@ -1,4 +1,30 @@
-.DS_Store
-.claude/
-*.log
+# Dotfiles/Dotfolders 일괄 제외 (AI도구, IDE, 빌드캐시, 환경변수 등 한번에 처리)
+.*
+!.gitignore
+!.env.example
+!.github/
+
+# 보안
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+
+# AI instruction files (non-dot)
+*.md
+!README.md
+
+# 빌드/의존성
 node_modules/
+dist/
+out/
+build/
+target/
+
+# DB
+*.db
+*.db-journal
+*.db-wal
+data/
