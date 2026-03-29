@@ -13,7 +13,7 @@ credentials.json
 service-account*.json
 
 # AI instruction files (non-dot)
-*.md
+# *.md // AI로 진행하는 프로젝트
 !README.md
 
 # 빌드/의존성
