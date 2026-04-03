@@ -1,3 +1,6 @@
+# OS
+.DS_Store
+
 # Dotfiles/Dotfolders 일괄 제외 (AI도구, IDE, 빌드캐시, 환경변수 등 한번에 처리)
 .*
 !.gitignore
