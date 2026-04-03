@@ -34,3 +34,9 @@ _temp/
 
 # AI 문서 폴더 허용
 !.ai_docs/
+!.claude/
+.claude/.env
+.claude/access.json
+.claude/settings.local.json
+.claude/inbox/
+.claude/ide/
